@@ -1,8 +1,22 @@
 from flask import Flask, render_template, request, redirect, url_for
 import json
 import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+# Configuration for file uploads
+UPLOAD_FOLDER_IMG = 'assets/img'
+UPLOAD_FOLDER_PDF = 'assets/pdf'
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+ALLOWED_PDF_EXTENSIONS = {'pdf'}
+
+app.config['UPLOAD_FOLDER_IMG'] = UPLOAD_FOLDER_IMG
+app.config['UPLOAD_FOLDER_PDF'] = UPLOAD_FOLDER_PDF
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max 16MB per file
+
+def allowed_file(filename, allowed_extensions):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 # Fungsi untuk menghitung titik polygon Radar Chart
 def calculate_radar_points(math, code, hw, novelty):
@@ -21,10 +35,35 @@ def index():
 @app.route('/generate', methods=['POST'])
 def generate():
     data = request.form
+    log_id = data['log_id']
+    
+    # Handle Image Upload
+    image_filename = data.get('image_file', '')  # Manual input
+    if 'image_upload' in request.files:
+        image_file = request.files['image_upload']
+        if image_file and image_file.filename != '' and allowed_file(image_file.filename, ALLOWED_IMAGE_EXTENSIONS):
+            # Get file extension
+            file_ext = image_file.filename.rsplit('.', 1)[1].lower()
+            # Create filename with log_id prefix
+            image_filename = f"{log_id}-arch.{file_ext}"
+            # Save file
+            os.makedirs(UPLOAD_FOLDER_IMG, exist_ok=True)
+            image_file.save(os.path.join(UPLOAD_FOLDER_IMG, image_filename))
+    
+    # Handle PDF Upload
+    pdf_filename = data.get('pdf_file', '')  # Manual input
+    if 'pdf_upload' in request.files:
+        pdf_file = request.files['pdf_upload']
+        if pdf_file and pdf_file.filename != '' and allowed_file(pdf_file.filename, ALLOWED_PDF_EXTENSIONS):
+            # Create filename with log_id prefix
+            pdf_filename = f"{log_id}-annotated.pdf"
+            # Save file
+            os.makedirs(UPLOAD_FOLDER_PDF, exist_ok=True)
+            pdf_file.save(os.path.join(UPLOAD_FOLDER_PDF, pdf_filename))
     
     # 1. Siapkan Data
     paper_data = {
-        "log_id": data['log_id'],
+        "log_id": log_id,
         "filename": data['filename'],
         "title": data['title'],
         "authors": data['authors'],
@@ -44,9 +83,9 @@ def generate():
         "dataset": data['dataset'],
         "method_tech": data['method_tech'],
         "video_id": data['video_id'],
-        "image_file": data['image_file'],
+        "image_file": image_filename,
         "image_caption": data['image_caption'],
-        "pdf_file": data['pdf_file'],
+        "pdf_file": pdf_filename,
         "bibtex": data['bibtex']
     }
 
@@ -72,6 +111,15 @@ def generate():
     db.append(paper_data)
     with open(json_path, 'w') as f:
         json.dump(db, f, indent=4)
+
+    # Prepare upload info for success page
+    upload_info = []
+    if image_filename:
+        upload_info.append(f"📷 Image: {image_filename}")
+    if pdf_filename:
+        upload_info.append(f"📄 PDF: {pdf_filename}")
+    
+    upload_status = "<br>".join(upload_info) if upload_info else "No files uploaded"
 
     # Return stylish success page
     return f"""
@@ -291,7 +339,10 @@ def generate():
         <div class="file-path">
             <strong>FILENAME:</strong> {data['filename']}<br>
             <strong>PAPER ID:</strong> #{data['log_id']}<br>
-            <strong>TITLE:</strong> {data['title'][:50]}{'...' if len(data['title']) > 50 else ''}
+            <strong>TITLE:</strong> {data['title'][:50]}{'...' if len(data['title']) > 50 else ''}<br>
+            <br>
+            <strong>FILES UPLOADED:</strong><br>
+            {upload_status}
         </div>
 
         <div class="buttons">
@@ -379,8 +430,9 @@ def generate():
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach(particle => {{
                 particle.update();
-                particle.draw();
-            }});
+    os.makedirs('reviews', exist_ok=True)
+    os.makedirs('assets/img', exist_ok=True)
+    os.makedirs('assets/pdf', exist_ok=True
             requestAnimationFrame(animate);
         }}
 

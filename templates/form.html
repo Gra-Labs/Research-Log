@@ -178,12 +178,61 @@
 
         /* Placeholder color correction */
         ::placeholder { color: #555; opacity: 1; }
+
+        /* --- FILE INPUT STYLING --- */
+        input[type="file"] {
+            cursor: pointer;
+            padding: 12px;
+            background: rgba(255, 51, 51, 0.05) !important;
+            border: 2px dashed #ff3333 !important;
+            transition: all 0.3s;
+        }
+
+        input[type="file"]:hover {
+            background: rgba(255, 51, 51, 0.1) !important;
+            border-color: #ff0000 !important;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            background: #ff3333;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        input[type="file"]::-webkit-file-upload-button:hover {
+            background: #ff0000;
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+
+        small {
+            display: block;
+            color: #888;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+
+        #imagePreview img {
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>[+] RONIN LOG GENERATOR</h1>
-        <form action="/generate" method="POST">
+        <h1>[+] PAPER LOG GENERATOR</h1>
+        <form action="/generate" method="POST" enctype="multipart/form-data">
             
             <div class="row">
                 <div class="form-group">
@@ -264,23 +313,33 @@
                 <div class="form-group"><label>DATASET USED</label><input type="text" name="dataset" placeholder="KITTI, EuRoC..."></div>
                 <div class="form-group"><label>CORE METHOD</label><input type="text" name="method_tech" placeholder="Kalman Filter, CNN..."></div>
             </div>
-            <div class="row">
-                <div class="form-group">
-                    <label>VIDEO ID (YouTube)</label>
-                    <input type="text" name="video_id" placeholder="Contoh: dQw4w9WgXcQ">
-                </div>
-                <div class="form-group">
-                    <label>IMAGE FILENAME (di folder assets/img)</label>
-                    <input type="text" name="image_file" placeholder="002-arch.png">
-                </div>
+            <div class="form-group">
+                <label>VIDEO ID (YouTube)</label>
+                <input type="text" name="video_id" placeholder="Contoh: dQw4w9WgXcQ">
             </div>
-             <div class="form-group">
+
+            <hr>
+
+            <h3>// FILE UPLOADS</h3>
+            <div class="form-group">
+                <label>UPLOAD IMAGE (otomatis diberi nama: {log_id}-arch.png/jpg)</label>
+                <input type="file" name="image_upload" accept="image/*" onchange="previewImage(event)" style="background: rgba(255,255,255,0.05); border: 1px dashed #ff3333; padding: 10px;">
+                <small style="color: #888; display: block; margin-top: 5px;">Atau isi manual di bawah jika file sudah ada</small>
+                <input type="text" name="image_file" placeholder="Manual: 002-arch.png (opsional)" style="margin-top: 10px;">
+                <div id="imagePreview" style="margin-top: 10px; max-width: 300px;"></div>
+            </div>
+            
+            <div class="form-group">
                 <label>IMAGE CAPTION</label>
                 <input type="text" name="image_caption" placeholder="Figure 1: System Overview">
             </div>
+
             <div class="form-group">
-                <label>PDF FILENAME (di folder assets/pdf)</label>
-                <input type="text" name="pdf_file" placeholder="002-annotated.pdf">
+                <label>UPLOAD PDF (otomatis diberi nama: {log_id}-annotated.pdf)</label>
+                <input type="file" name="pdf_upload" accept=".pdf" onchange="showPdfName(event)" style="background: rgba(255,255,255,0.05); border: 1px dashed #ff3333; padding: 10px;">
+                <small style="color: #888; display: block; margin-top: 5px;">Atau isi manual di bawah jika file sudah ada</small>
+                <input type="text" name="pdf_file" placeholder="Manual: 002-annotated.pdf (opsional)" style="margin-top: 10px;">
+                <div id="pdfInfo" style="margin-top: 10px; color: #0f0;"></div>
             </div>
             <div class="form-group">
                 <label>BIBTEX CODE</label>
@@ -374,6 +433,39 @@
         }
 
         animate();
+
+        // Image Preview Function
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" style="max-width: 100%; border: 2px solid #ff3333; box-shadow: 0 0 20px rgba(255,51,51,0.5);">
+                        <p style="color: #0f0; margin-top: 10px; font-size: 0.9rem;">
+                            ✓ File: ${file.name} (${(file.size / 1024).toFixed(2)} KB)
+                        </p>
+                    `;
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        }
+
+        // PDF Info Function
+        function showPdfName(event) {
+            const file = event.target.files[0];
+            const info = document.getElementById('pdfInfo');
+            
+            if (file) {
+                info.innerHTML = `✓ PDF Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
+            } else {
+                info.innerHTML = '';
+            }
+        }
     </script>
 </body>
 </html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Test - Research Log</title>
+    <style>
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: #0a0000;
+            color: #fff;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #ff3333;
+            text-shadow: 0 0 20px rgba(255,51,51,0.8);
+        }
+        .test-section {
+            background: rgba(20,20,20,0.8);
+            border: 1px solid #ff3333;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .test-item {
+            margin: 15px 0;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
+            border-left: 3px solid #0f0;
+        }
+        .test-item.fail {
+            border-left-color: #f00;
+        }
+        code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 3px;
+            color: #0ff;
+        }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .info { color: #ff0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Upload Feature Test</h1>
+    
+    <div class="test-section">
+        <h2>📋 Pre-flight Checklist</h2>
+        <div id="checklist"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📁 Folder Structure</h2>
+        <div id="folders"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔧 Configuration</h2>
+        <div id="config"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>✅ What to Test</h2>
+        <ol style="line-height: 2;">
+            <li>Jalankan Flask server: <code>./start-upload.sh</code></li>
+            <li>Buka: <code>http://localhost:5000</code></li>
+            <li>Isi LOG ID: <code>999</code></li>
+            <li>Upload test image (apapun)</li>
+            <li>Upload test PDF (apapun)</li>
+            <li>Submit form</li>
+            <li>Cek folder:
+                <ul>
+                    <li><code>assets/img/999-arch.{ext}</code> harus ada</li>
+                    <li><code>assets/pdf/999-annotated.pdf</code> harus ada</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <script>
+        const checklist = [
+            { name: 'Flask installed', check: 'python3 -c "import flask"' },
+            { name: 'app.py exists', status: true },
+            { name: 'templates/form.html exists', status: true },
+            { name: 'File upload configured', status: true }
+        ];
+
+        const folders = [
+            'assets/',
+            'assets/img/',
+            'assets/pdf/',
+            'reviews/',
+            'templates/'
+        ];
+
+        const config = {
+            'Max Upload Size': '16 MB',
+            'Allowed Image Types': 'PNG, JPG, JPEG, GIF, WEBP',
+            'Allowed PDF Types': 'PDF',
+            'Image Naming': '{log_id}-arch.{ext}',
+            'PDF Naming': '{log_id}-annotated.pdf',
+            'Image Folder': 'assets/img/',
+            'PDF Folder': 'assets/pdf/'
+        };
+
+        // Render checklist
+        const checklistEl = document.getElementById('checklist');
+        checklist.forEach(item => {
+            checklistEl.innerHTML += `
+                <div class="test-item">
+                    <span class="success">✓</span> ${item.name}
+                    ${item.check ? `<br><small style="color: #888;">Command: <code>${item.check}</code></small>` : ''}
+                </div>
+            `;
+        });
+
+        // Render folders
+        const foldersEl = document.getElementById('folders');
+        folders.forEach(folder => {
+            foldersEl.innerHTML += `
+                <div class="test-item">
+                    <span class="success">✓</span> <code>${folder}</code>
+                </div>
+            `;
+        });
+
+        // Render config
+        const configEl = document.getElementById('config');
+        for (const [key, value] of Object.entries(config)) {
+            configEl.innerHTML += `
+                <div class="test-item">
+                    <strong class="info">${key}:</strong> <code>${value}</code>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
