@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobile Test - Paper Research Log</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,26,26,0.3);
+            border-radius: 8px;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .pass { background: #0f0; color: #000; }
+        .fail { background: #f00; color: #fff; }
+        .info { background: #ff0; color: #000; }
+        code {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+        h1 { color: #ff1a1a; }
+        h2 { font-size: 18px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Mobile Optimization Test</h1>
+    
+    <div class="test-section">
+        <h2>Device Detection</h2>
+        <p>User Agent: <code id="ua"></code></p>
+        <p>Is Mobile: <span id="isMobile" class="status"></span></p>
+        <p>Is Touch Device: <span id="isTouch" class="status"></span></p>
+        <p>Screen Width: <code id="screenWidth"></code></p>
+        <p>Viewport Width: <code id="viewportWidth"></code></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Performance Features</h2>
+        <p>Fire Particles: <span id="fireParticles" class="status"></span></p>
+        <p>Custom Cursor: <span id="customCursor" class="status"></span></p>
+        <p>3D Tilt Effects: <span id="tiltEffects" class="status"></span></p>
+        <p>Backdrop Blur: <span id="backdropBlur" class="status"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>CSS Media Queries</h2>
+        <p>Mobile Query (≤768px): <span id="mobileQuery" class="status"></span></p>
+        <p>Tablet Query (≤992px): <span id="tabletQuery" class="status"></span></p>
+        <p>Touch Device Query: <span id="touchQuery" class="status"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Recommendations</h2>
+        <ul id="recommendations"></ul>
+    </div>
+
+    <script>
+        // Device Detection
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        const screenWidth = window.screen.width;
+        const viewportWidth = window.innerWidth;
+
+        // Update UI
+        document.getElementById('ua').textContent = navigator.userAgent.substring(0, 80) + '...';
+        document.getElementById('isMobile').textContent = isMobile ? 'YES' : 'NO';
+        document.getElementById('isMobile').className = 'status ' + (isMobile ? 'info' : 'pass');
+        
+        document.getElementById('isTouch').textContent = isTouchDevice ? 'YES' : 'NO';
+        document.getElementById('isTouch').className = 'status ' + (isTouchDevice ? 'info' : 'pass');
+        
+        document.getElementById('screenWidth').textContent = screenWidth + 'px';
+        document.getElementById('viewportWidth').textContent = viewportWidth + 'px';
+
+        // Performance Features
+        const shouldEnableFireParticles = !isMobile && !isTouchDevice && viewportWidth > 768;
+        document.getElementById('fireParticles').textContent = shouldEnableFireParticles ? 'ENABLED' : 'DISABLED';
+        document.getElementById('fireParticles').className = 'status ' + (shouldEnableFireParticles ? 'pass' : 'info');
+
+        const shouldEnableCursor = !isMobile && !isTouchDevice;
+        document.getElementById('customCursor').textContent = shouldEnableCursor ? 'ENABLED' : 'DISABLED';
+        document.getElementById('customCursor').className = 'status ' + (shouldEnableCursor ? 'pass' : 'info');
+
+        const shouldEnableTilt = !isMobile && !isTouchDevice;
+        document.getElementById('tiltEffects').textContent = shouldEnableTilt ? 'ENABLED' : 'DISABLED';
+        document.getElementById('tiltEffects').className = 'status ' + (shouldEnableTilt ? 'pass' : 'info');
+
+        const shouldEnableBlur = viewportWidth > 768;
+        document.getElementById('backdropBlur').textContent = shouldEnableBlur ? 'ENABLED' : 'DISABLED';
+        document.getElementById('backdropBlur').className = 'status ' + (shouldEnableBlur ? 'pass' : 'info');
+
+        // CSS Media Queries
+        const mobileQuery = window.matchMedia('(max-width: 768px)').matches;
+        document.getElementById('mobileQuery').textContent = mobileQuery ? 'ACTIVE' : 'INACTIVE';
+        document.getElementById('mobileQuery').className = 'status ' + (mobileQuery ? 'info' : 'pass');
+
+        const tabletQuery = window.matchMedia('(max-width: 992px)').matches;
+        document.getElementById('tabletQuery').textContent = tabletQuery ? 'ACTIVE' : 'INACTIVE';
+        document.getElementById('tabletQuery').className = 'status ' + (tabletQuery ? 'info' : 'pass');
+
+        const touchQuery = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        document.getElementById('touchQuery').textContent = touchQuery ? 'ACTIVE' : 'INACTIVE';
+        document.getElementById('touchQuery').className = 'status ' + (touchQuery ? 'info' : 'pass');
+
+        // Recommendations
+        const recommendations = [];
+        
+        if (isMobile || isTouchDevice) {
+            recommendations.push('✅ Mobile optimizations are ACTIVE');
+            recommendations.push('✅ Heavy animations are DISABLED for better performance');
+            recommendations.push('✅ Touch interactions are ENABLED');
+        } else {
+            recommendations.push('✅ Desktop experience is ACTIVE');
+            recommendations.push('✅ All visual effects are ENABLED');
+            recommendations.push('✅ Mouse interactions are ENABLED');
+        }
+
+        if (viewportWidth <= 768) {
+            recommendations.push('📱 Using mobile layout (single column grid)');
+        } else if (viewportWidth <= 992) {
+            recommendations.push('📱 Using tablet layout (2-column grid)');
+        } else {
+            recommendations.push('💻 Using desktop layout (3-column grid)');
+        }
+
+        if (navigator.connection && navigator.connection.saveData) {
+            recommendations.push('⚠️ Data Saver mode detected - extra optimizations applied');
+        }
+
+        const recList = document.getElementById('recommendations');
+        recommendations.forEach(rec => {
+            const li = document.createElement('li');
+            li.textContent = rec;
+            recList.appendChild(li);
+        });
+    </script>
+</body>
+</html>

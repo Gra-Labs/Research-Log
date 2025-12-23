@@ -11,6 +11,17 @@
     --font-tech: 'JetBrains Mono', monospace;
 }
 
+* {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Better scroll performance on mobile */
+    -webkit-overflow-scrolling: touch;
+}
+
 /* --- GANTI STYLE BODY DENGAN INI --- */
 body {
     background: linear-gradient(to bottom, #0a0000, #1a0000, #0a0000); /* Gradasi merah gelap */
@@ -26,6 +37,9 @@ body {
     
     /* Animasi background bergerak */
     animation: bgPulse 8s ease-in-out infinite;
+    
+    /* Improve mobile scrolling */
+    -webkit-tap-highlight-color: rgba(255, 26, 26, 0.2);
 }
 
 @keyframes bgPulse {
@@ -238,6 +252,9 @@ body::after {
     position: relative; cursor: pointer;
     /* Tilt.js akan menambahkan transform style di sini */
     transform-style: preserve-3d;
+    /* Better touch interaction */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
 .card-inner {
@@ -322,8 +339,18 @@ body::after {
 .btn-access {
     display: block; text-align: center; width: 100%;
     background: transparent; border: 1px solid var(--neon-red);
-    color: var(--neon-red); padding: 12px 0; font-weight: 800; letter-spacing: 2px;
-    text-decoration: none; transition: all 0.3s; font-family: var(--font-tech);
+    /* Better touch target */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+.btn-access:hover { background: var(--neon-red); color: var(--bg-core); box-shadow: 0 0 20px var(--neon-glow); }
+
+/* Touch/Active state for mobile */
+.btn-access:active {
+    background: var(--neon-red);
+    color: var(--bg-core);
+    transform: scale(0.98);
+
     position: relative; overflow: hidden; z-index: 10;
 }
 .btn-access:hover { background: var(--neon-red); color: var(--bg-core); box-shadow: 0 0 20px var(--neon-glow); }
@@ -381,13 +408,230 @@ body::after {
         display: none; /* Hilangkan setelah selesai */
     }
 }
-/* Responsive Fix */
+/* ===== RESPONSIVE MOBILE/TABLET OPTIMIZATION ===== */
+/* Disable hover effects on touch devices */
+@media (hover: none) and (pointer: coarse) {
+    .paper-card:hover .card-inner {
+        transform: none;
+        box-shadow: none;
+        background: var(--card-bg);
+        border-color: var(--border-subtle);
+    }
+    
+    .paper-card:active .card-inner {
+        border-color: #ff0000;
+        box-shadow: 
+            0 0 30px rgba(255, 0, 0, 0.6),
+            0 0 60px rgba(255, 0, 0, 0.3),
+            inset 0 0 20px rgba(255, 0, 0, 0.4);
+        background: rgba(20, 0, 0, 0.9);
+    }
+}
+
+/* Tablet & Small Desktop (portrait tablets, small laptops) */
+@media (max-width: 992px) {
+    .paper-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .container {
+        padding: 0 15px;
+    }
+    
+    .logo-area h1 {
+        font-size: 2rem;
+    }
+    
+    .paper-title {
+        font-size: 1.2rem;
+    }
+}
+
+/* Mobile (phones) */
 @media (max-width: 768px) {
-    .main-header h1 { font-size: 1.8rem; }
-    .card-bottom-layout { flex-direction: column; align-items: flex-start; }
-    .radar-container { margin-top: 20px; align-self: flex-end; }
-    .cursor-follower { display: none; /* Matikan custom cursor di HP */ }
-    body { cursor: auto; }
+    /* Disable custom cursor */
+    .cursor-follower { 
+        display: none !important;
+    }
+    body { 
+        cursor: auto !important;
+    }
+    
+    /* Disable background effects that are performance-heavy */
+    body::before,
+    body::after {
+        animation: none;
+        opacity: 0.2;
+    }
+    
+    #bg-canvas {
+        display: none; /* Disable fire particles on mobile */
+    }
+    
+    /* Header optimization */
+    .main-header {
+        padding: 20px 15px;
+    }
+    
+    .logo-area h1 { 
+        font-size: 1.6rem;
+        text-align: center;
+    }
+    
+    .logo-area p {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    
+    /* Search wrapper mobile fix */
+    .search-wrapper {
+        max-width: 100%;
+    }
+    
+    #search-input {
+        font-size: 16px; /* Prevent zoom on iOS */
+        padding: 12px 12px 12px 45px;
+    }
+    
+    .search-icon-box {
+        left: 12px;
+    }
+    
+    /* Shrunk header mobile */
+    .main-header.shrunk {
+        padding: 10px 15px;
+    }
+    
+    .main-header.shrunk .search-wrapper {
+        max-width: 100%;
+    }
+    
+    /* Grid optimization */
+    .paper-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .container {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    
+    /* Card optimization */
+    .paper-card {
+        /* Disable 3D transform on mobile */
+        transform: none !important;
+    }
+    
+    .card-inner {
+        padding: 20px;
+        /* Disable backdrop blur on mobile for better performance */
+        backdrop-filter: none;
+        background: rgba(20, 20, 20, 0.95);
+    }
+    
+    /* Card layout mobile */
+    .card-bottom-layout { 
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .meta-data {
+        width: 100%;
+    }
+    
+    .radar-container { 
+        align-self: flex-end;
+        width: 70px;
+        height: 70px;
+    }
+    
+    /* Typography */
+    .paper-title {
+        font-size: 1.1rem;
+        margin: 8px 0 15px 0;
+    }
+    
+    .paper-id {
+        font-size: 0.7rem;
+    }
+    
+    .tags .tag {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+        margin-bottom: 5px;
+    }
+    
+    .conference {
+        font-size: 0.8rem;
+    }
+    
+    /* Button optimization */
+    .btn-access {
+        padding: 14px 0;
+        font-size: 0.9rem;
+        letter-spacing: 1.5px;
+        /* Better tap target */
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Cyber kamon position */
+    .cyber-kamon {
+        top: 15px;
+        right: 15px;
+        width: 20px;
+        height: 20px;
+    }
+    
+    .cyber-kamon svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .logo-area h1 {
+        font-size: 1.4rem;
+    }
+    
+    .paper-title {
+        font-size: 1rem;
+    }
+    
+    .card-inner {
+        padding: 15px;
+    }
+    
+    .radar-container {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .tags .tag {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+}
+
+/* Fix for Android landscape mode */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-header {
+        padding: 15px;
+    }
+    
+    .logo-area h1 {
+        font-size: 1.4rem;
+    }
+    
+    .logo-area p {
+        margin: 3px 0 10px 0;
+    }
 }
 
 /* --- VIDEO RESPONSIVE CONTAINER --- */

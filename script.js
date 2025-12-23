@@ -1,35 +1,45 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    /* --- MOBILE/TOUCH DEVICE DETECTION --- */
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
     /* --- 1. CUSTOM CURSOR & SLASH EFFECT --- */
     const cursor = document.querySelector('.cursor-follower');
     let isMoving = false;
 
-    // Update posisi kursor
-    document.addEventListener('mousemove', (e) => {
-        if (!isMoving) {
-            // Ubah bentuk jadi crosshair kecil saat mulai bergerak
-            cursor.style.width = '10px';
-            cursor.style.height = '10px';
-            cursor.style.borderRadius = '0'; 
-            isMoving = true;
-        }
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
+    // Only enable cursor effects on non-touch devices
+    if (!isTouchDevice && !isMobile) {
+        // Update posisi kursor
+        document.addEventListener('mousemove', (e) => {
+            if (!isMoving) {
+                // Ubah bentuk jadi crosshair kecil saat mulai bergerak
+                cursor.style.width = '10px';
+                cursor.style.height = '10px';
+                cursor.style.borderRadius = '0'; 
+                isMoving = true;
+            }
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
 
-        // 2. TAMBAHAN BARU: Kirim posisi X/Y ke Body CSS untuk Background
-        const body = document.querySelector('body');
-        body.style.setProperty('--x', e.clientX + 'px');
-        body.style.setProperty('--y', e.clientY + 'px');
-    });
+            // 2. TAMBAHAN BARU: Kirim posisi X/Y ke Body CSS untuk Background
+            const body = document.querySelector('body');
+            body.style.setProperty('--x', e.clientX + 'px');
+            body.style.setProperty('--y', e.clientY + 'px');
+        });
 
-    // Efek Sabetan Pedang saat klik
-    document.addEventListener('click', () => {
-        cursor.classList.add('cursor-slash');
-        // Hapus kelas setelah animasi selesai (400ms sesuai CSS)
-        setTimeout(() => {
-            cursor.classList.remove('cursor-slash');
-        }, 400);
-    });
+        // Efek Sabetan Pedang saat klik
+        document.addEventListener('click', () => {
+            cursor.classList.add('cursor-slash');
+            // Hapus kelas setelah animasi selesai (400ms sesuai CSS)
+            setTimeout(() => {
+                cursor.classList.remove('cursor-slash');
+            }, 400);
+        });
+    } else {
+        // Hide cursor follower on mobile
+        if (cursor) cursor.style.display = 'none';
+    }
 
 
     /* --- 2. DYNAMIC SWORD SHEATH HEADER --- */
@@ -62,14 +72,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     /* --- 3. VANILLA TILT INIT --- */
-    // Inisialisasi efek 3D pada semua kartu
-    VanillaTilt.init(document.querySelectorAll(".paper-card"), {
-        max: 12,            // Maksimal kemiringan
-        speed: 400,         // Kecepatan transisi
-        glare: true,        // Efek kilau
-        "max-glare": 0.3,   // Opasitas kilau
-        scale: 1.02         // Sedikit zoom saat hover
-    });
+    // Inisialisasi efek 3D pada semua kartu (only on non-mobile devices)
+    if (!isMobile && !isTouchDevice) {
+        VanillaTilt.init(document.querySelectorAll(".paper-card"), {
+            max: 12,            // Maksimal kemiringan
+            speed: 400,         // Kecepatan transisi
+            glare: true,        // Efek kilau
+            "max-glare": 0.3,   // Opasitas kilau
+            scale: 1.02         // Sedikit zoom saat hover
+        });
+    }
 
 
 /* --- 4. DATA DIVE TRANSITION (UPDATED) --- */
@@ -108,89 +120,90 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500); 
         });
     });
-
-    /* --- 5. FIRE PARTICLE ANIMATION --- */
-    const canvas = document.createElement('canvas');
-    canvas.id = 'bg-canvas';
-    document.body.insertBefore(canvas, document.body.firstChild);
-    
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    // Resize canvas saat window berubah ukuran
-    window.addEventListener('resize', () => {
+// Only enable fire particles on desktop (performance heavy)
+    if (!isMobile && !isTouchDevice && window.innerWidth > 768) {
+        const canvas = document.createElement('canvas');
+        canvas.id = 'bg-canvas';
+        document.body.insertBefore(canvas, document.body.firstChild);
+        
+        const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-    });
 
-    class FireParticle {
-        constructor() {
-            this.reset();
-        }
-
-        reset() {
-            this.x = Math.random() * canvas.width;
-            this.y = canvas.height + Math.random() * 100;
-            this.size = Math.random() * 3 + 1;
-            this.speedY = Math.random() * 3 + 1;
-            this.speedX = (Math.random() - 0.5) * 2;
-            this.opacity = Math.random() * 0.5 + 0.5;
-            // Warna merah api yang bervariasi
-            const colorVariant = Math.floor(Math.random() * 3);
-            if (colorVariant === 0) {
-                this.color = `rgba(255, 50, 0, ${this.opacity})`; // Merah terang
-            } else if (colorVariant === 1) {
-                this.color = `rgba(255, 100, 0, ${this.opacity})`; // Orange
-            } else {
-                this.color = `rgba(255, 0, 0, ${this.opacity})`; // Merah murni
-            }
-        }
-
-        update() {
-            this.y -= this.speedY;
-            this.x += this.speedX;
-            this.opacity -= 0.003;
-            this.size *= 0.99;
-
-            // Reset particle jika keluar layar atau terlalu transparan
-            if (this.y < -10 || this.opacity <= 0 || this.size < 0.5) {
-                this.reset();
-            }
-        }
-
-        draw() {
-            ctx.fillStyle = this.color;
-            ctx.globalAlpha = this.opacity;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Tambahkan glow effect
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = this.color;
-        }
-    }
-
-    // Buat array partikel
-    const particles = [];
-    const particleCount = 150; // Jumlah partikel api
-    for (let i = 0; i < particleCount; i++) {
-        particles.push(new FireParticle());
-    }
-
-    // Animasi loop
-    function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        particles.forEach(particle => {
-            particle.update();
-            particle.draw();
+        // Resize canvas saat window berubah ukuran
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         });
 
-        requestAnimationFrame(animate);
-    }
+        class FireParticle {
+            constructor() {
+                this.reset();
+            }
 
-    animate();
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 3 + 1;
+                this.speedY = Math.random() * 3 + 1;
+                this.speedX = (Math.random() - 0.5) * 2;
+                this.opacity = Math.random() * 0.5 + 0.5;
+                // Warna merah api yang bervariasi
+                const colorVariant = Math.floor(Math.random() * 3);
+                if (colorVariant === 0) {
+                    this.color = `rgba(255, 50, 0, ${this.opacity})`; // Merah terang
+                } else if (colorVariant === 1) {
+                    this.color = `rgba(255, 100, 0, ${this.opacity})`; // Orange
+                } else {
+                    this.color = `rgba(255, 0, 0, ${this.opacity})`; // Merah murni
+                }
+            }
+
+            update() {
+                this.y -= this.speedY;
+                this.x += this.speedX;
+                this.opacity -= 0.003;
+                this.size *= 0.99;
+
+                // Reset particle jika keluar layar atau terlalu transparan
+                if (this.y < -10 || this.opacity <= 0 || this.size < 0.5) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.globalAlpha = this.opacity;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Tambahkan glow effect
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = this.color;
+            }
+        }
+
+        // Buat array partikel
+        const particles = [];
+        const particleCount = 150; // Jumlah partikel api
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new FireParticle());
+        }
+
+        // Animasi loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    }
 });
-// Background canvas animation added - fire particles effect
+// Background canvas animation added - fire particles effect (desktop only)
