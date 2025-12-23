@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAPER RESEARCH LOG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="cursor-follower"></div>
+
+    <header class="main-header" id="main-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <h1>PAPER <span class="highlight">REVIEW</span></h1>
+                <p>PAPER RESEARCH DATABASE</p>
+            </div>
+            <div class="search-wrapper" id="search-wrapper">
+               <div class="search-icon-box">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+               </div>
+               <input type="text" id="search-input" placeholder="Search protocol initialized...">
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="paper-grid fade-in" id="paper-grid">
+            <!-- Papers akan di-load otomatis dari papers.json menggunakan JavaScript -->
+            <div class="loading-message" style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #888;">
+                <h2 style="color: #ff3333; margin-bottom: 15px; animation: neonPulse 2s ease-in-out infinite;">LOADING PAPERS...</h2>
+                <p>Fetching data from database...</p>
+            </div>
+        </div>
+    </main>
+
+    <div class="morph-overlay" id="morph-overlay"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="script.js"></script>
+    
+    <script>
+        // Load papers from papers.json dynamically
+        async function loadPapers() {
+            const gridContainer = document.getElementById('paper-grid');
+            
+            try {
+                const response = await fetch('papers.json');
+                const papers = await response.json();
+                
+                // Clear loading message
+                gridContainer.innerHTML = '';
+                
+                if (papers && papers.length > 0) {
+                    papers.forEach(paper => {
+                        // Extract year from publication
+                        let year = '2024';
+                        const yearMatch = paper.publication.match(/\((\d{4})\)/);
+                        if (yearMatch) {
+                            year = yearMatch[1];
+                        } else {
+                            const yearMatch2 = paper.publication.match(/(\d{4})/);
+                            if (yearMatch2) year = yearMatch2[1];
+                        }
+                        
+                        // Get first 3 tags
+                        const displayTags = paper.tags.slice(0, 3);
+                        
+                        // Create card HTML
+                        const cardHTML = `
+                            <div class="paper-card theme-slam" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2">
+                                <div class="card-inner">
+                                    <div class="cyber-kamon">
+                                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </div>
+
+                                    <span class="paper-id">#${paper.log_id} // ${year}</span>
+                                    <h3 class="paper-title">${paper.title}</h3>
+                                    
+                                    <div class="card-bottom-layout">
+                                        <div class="meta-data">
+                                            <div class="tags">
+                                                ${displayTags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                            </div>
+                                            <p class="conference">${paper.publication}</p>
+                                        </div>
+
+                                        <div class="radar-container">
+                                            <svg viewBox="0 0 100 100" class="radar-svg">
+                                                <polygon points="50,5 95,50 50,95 5,50" class="radar-grid"/>
+                                                <polygon points="50,27.5 72.5,50 50,72.5 27.5,50" class="radar-grid"/>
+                                                
+                                                <polygon points="${paper.radar_points}" class="radar-data"/>
+                                            </svg>
+                                            <div class="radar-labels">
+                                                <span>Math</span><span>Code</span><span>New</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <a href="./reviews/${paper.filename}" class="btn-access js-trigger-morph">ACCESS DATA</a>
+                                </div>
+                            </div>
+                        `;
+                        
+                        gridContainer.innerHTML += cardHTML;
+                    });
+                    
+                    // Re-initialize VanillaTilt for new cards
+                    VanillaTilt.init(document.querySelectorAll(".paper-card"), {
+                        max: 12,
+                        speed: 400,
+                        glare: true,
+                        "max-glare": 0.3,
+                        scale: 1.02
+                    });
+                } else {
+                    gridContainer.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #888;">
+                            <h2 style="color: #ff3333; margin-bottom: 15px;">NO PAPERS FOUND</h2>
+                            <p style="margin-bottom: 25px;">No papers in database yet.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading papers:', error);
+                gridContainer.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #888;">
+                        <h2 style="color: #ff3333; margin-bottom: 15px;">ERROR LOADING PAPERS</h2>
+                        <p>Could not load papers.json. Make sure the file exists.</p>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load papers when page loads
+        document.addEventListener('DOMContentLoaded', loadPapers);
+    </script>
+</body>
+</html>

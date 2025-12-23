@@ -1,0 +1,408 @@
+/* --- VARIABLES & CORE RESET --- */
+:root {
+    --bg-core: #000000;       /* Hitam Pekat */
+    --neon-red: #ff1a1a;      /* Merah Neon Agresif */
+    --neon-glow: rgba(255, 26, 26, 0.5);
+    --text-primary: #ffffff;  /* Putih Tajam */
+    --text-secondary: #a3a3a3;
+    --card-bg: rgba(20, 20, 20, 0.8); /* Glassmorphism gelap */
+    --border-subtle: rgba(255, 26, 26, 0.2);
+    --font-main: 'Inter', sans-serif;
+    --font-tech: 'JetBrains Mono', monospace;
+}
+
+/* --- GANTI STYLE BODY DENGAN INI --- */
+body {
+    background: linear-gradient(to bottom, #0a0000, #1a0000, #0a0000); /* Gradasi merah gelap */
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    margin: 0; padding: 0;
+    overflow-x: hidden;
+    position: relative;
+    
+    /* Variable posisi mouse default (tengah layar) */
+    --x: 50vw;
+    --y: 50vh;
+    
+    /* Animasi background bergerak */
+    animation: bgPulse 8s ease-in-out infinite;
+}
+
+@keyframes bgPulse {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* LAYER 1: ANIMATED FIRE GRID (BASE) */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -2;
+    
+    /* Pola Grid dengan efek api bergerak */
+    background-image: 
+        linear-gradient(rgba(255, 26, 26, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 26, 26, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: fireGrid 4s linear infinite;
+}
+
+@keyframes fireGrid {
+    0% { 
+        background-position: 0 0;
+        opacity: 0.3;
+    }
+    50% { 
+        background-position: 25px 25px;
+        opacity: 0.6;
+    }
+    100% { 
+        background-position: 0 0;
+        opacity: 0.3;
+    }
+}
+
+/* LAYER 2: SOROTAN CAHAYA MOUSE + FIRE EFFECT (INTERAKTIF) */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: -1;
+    pointer-events: none;
+    
+    /* Efek api dan cahaya mengikuti mouse */
+    background: 
+        /* Fire glow mengikuti mouse */
+        radial-gradient(
+            800px circle at var(--x) var(--y), 
+            rgba(255, 0, 0, 0.25), 
+            rgba(255, 100, 0, 0.1) 30%,
+            transparent 50%
+        ),
+        /* Scanline halus */
+        linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+        /* Vignette */
+        radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+    
+    background-size: 100% 100%, 100% 4px, 100% 100%;
+    animation: fireFlicker 2s ease-in-out infinite;
+}
+
+@keyframes fireFlicker {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
+}
+
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3; /* Di belakang semua layer */
+    opacity: 0.4; /* Transparansi agar tidak menutupi konten */
+    pointer-events: none;
+    mix-blend-mode: screen; /* Blend mode untuk efek api yang lebih dramatis */
+}
+
+/* --- LOADING FADE IN --- */
+.fade-in { animation: fadeInOpacity 1s ease-in forwards; opacity: 0; }
+@keyframes fadeInOpacity { 100% { opacity: 1; } }
+
+/* --- CUSTOM CURSOR & SLASH EFFECT --- */
+.cursor-follower {
+    position: fixed;
+    width: 24px; height: 24px;
+    border: 2px solid var(--neon-red);
+    border-radius: 50%; /* Awal lingkaran, nanti jadi crosshair di JS */
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 9999;
+    transition: width 0.2s, height 0.2s, background 0.2sbox-shadow 0.2s; box-shadow: 0 0 10px var(--neon-glow);
+    mix-blend-mode: exclusion;
+}
+
+/* Efek Sabetan Pedang saat klik */
+.cursor-slash {
+    animation: slashAnimation 0.4s ease-out forwards;
+    background: var(--neon-red);
+    border-radius: 0 !important;
+    height: 2px !important;
+}
+@keyframes slashAnimation {
+    0% { width: 24px; transform: translate(-50%, -50%) rotate(0deg); opacity: 1; }
+    50% { width: 150px; transform: translate(-50%, -50%) rotate(45deg); opacity: 0.7; }
+    100% { width: 200px; transform: translate(-50%, -50%) rotate(45deg); opacity: 0; }
+}
+
+
+/* --- DYNAMIC SWORD SHEATH HEADER --- */
+.main-header {
+    position: sticky; top: 0; z-index: 100;
+    padding: 40px 20px;
+    background: linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border-bottom: 1px solid transparent;
+}
+
+.header-content {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; flex-direction: column; align-items: center;
+}
+
+.logo-area h1 { 
+    margin: 0; 
+    font-weight: 800; 
+    font-size: 2.5rem; 
+    letter-spacing: -1px;
+    /* Efek neon glow yang lebih kuat */
+    text-shadow: 
+        0 0 10px rgba(255, 26, 26, 0.8),
+        0 0 20px rgba(255, 26, 26, 0.6),
+        0 0 30px rgba(255, 26, 26, 0.4),
+        0 0 40px rgba(255, 26, 26, 0.2);
+    animation: neonPulse 2s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px rgba(255, 26, 26, 0.8),
+            0 0 20px rgba(255, 26, 26, 0.6),
+            0 0 30px rgba(255, 26, 26, 0.4),
+            0 0 40px rgba(255, 26, 26, 0.2);
+    }
+    50% {
+        text-shadow: 
+            0 0 15px rgba(255, 26, 26, 1),
+            0 0 30px rgba(255, 26, 26, 0.8),
+            0 0 45px rgba(255, 26, 26, 0.6),
+            0 0 60px rgba(255, 26, 26, 0.4);
+    }
+}
+
+.highlight { 
+    color: var(--neon-red); 
+    text-shadow: 
+        0 0 15px var(--neon-glow),
+        0 0 30px var(--neon-glow),
+        0 0 45px var(--neon-glow);
+    animation: neonFlicker 3s linear infinite;
+}
+
+@keyframes neonFlicker {
+    0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        opacity: 1;
+    }
+    20%, 24%, 55% {
+        opacity: 0.7;
+    }
+}
+.logo-area p { color: var(--text-secondary); margin: 5px 0 20px 0; font-family: var(--font-tech); font-size: 0.9rem;}
+
+.search-wrapper {
+    position: relative; width: 100%; max-width: 600px;
+    transition: all 0.4s ease;
+}
+.search-icon-box {
+    position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+    color: var(--neon-red); transition: all 0.4s ease;
+}
+#search-input {
+    width: 100%; padding: 15px 15px 15px 50px;
+    background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-subtle);
+    color: var(--text-primary); font-family: var(--font-tech);
+    border-radius: 4px; backdrop-filter: blur(10px); transition: all 0.3s;
+}
+#search-input:focus { outline: none; border-color: var(--neon-red); box-shadow: 0 0 20px var(--neon-glow); }
+
+/* Header Shrunk State (Saat Scroll) */
+.main-header.shrunk { padding: 15px 20px; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border-subtle); }
+.main-header.shrunk .logo-area { display: none; /* Sembunyikan logo */ }
+.main-header.shrunk .search-wrapper { max-width: 50px; overflow: hidden; cursor: pointer; }
+.main-header.shrunk .search-wrapper:hover, 
+.main-header.shrunk .search-wrapper.expanded { max-width: 600px; /* Pedang keluar dari sarung */ }
+.main-header.shrunk #search-input { padding-left: 50px; background: transparent; border-color: transparent; }
+.main-header.shrunk .search-wrapper:hover #search-input,
+.main-header.shrunk .search-wrapper.expanded #search-input { background: rgba(255, 255, 255, 0.05); border-color: var(--border-subtle); }
+
+
+/* --- GRID & CARDS --- */
+.container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+.paper-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px;
+}
+
+.paper-card {
+    position: relative; cursor: pointer;
+    /* Tilt.js akan menambahkan transform style di sini */
+    transform-style: preserve-3d;
+}
+
+.card-inner {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    padding: 25px; border-radius: 2px; /* Sudut tajam ala tech */
+    backdrop-filter: blur(20px);
+    transition: all 0.3s ease;
+    height: 100%; display: flex; flex-direction: column;
+    /* Efek Glare dari Tilt.js */
+    overflow: hidden;
+    transform: translateZ(20px); /* Agar konten menonjol sedikit */
+}
+
+.paper-card:hover .card-inner {
+    border-color: #ff0000; /* Merah Murni */
+    
+    /* Layer 1: Glow luar (menyebar) */
+    /* Layer 2: Glow dalam (inset - agar bagian dalam kartu ikut menyala) */
+    box-shadow: 
+        0 0 30px rgba(255, 0, 0, 0.6),    /* Glow Luar Tebal */
+        0 0 60px rgba(255, 0, 0, 0.3),    /* Glow Luar Halus */
+        inset 0 0 20px rgba(255, 0, 0, 0.4); /* Glow Dalam */
+        
+    transform: translateY(-5px) scale(1.02); /* Sedikit naik */
+    background: rgba(20, 0, 0, 0.9); /* Background jadi agak merah gelap */
+}
+
+/* Tambahkan sedikit glow pada teks judul saat hover agar terbaca jelas */
+.paper-card:hover .paper-title {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Kamon Theme Identity */
+.cyber-kamon { position: absolute; top: 20px; right: 20px; color: var(--neon-red); opacity: 0.7; }
+.paper-card.theme-slam:hover .cyber-kamon { filter: drop-shadow(0 0 8px var(--neon-red)); }
+
+.paper-id { font-family: var(--font-tech); font-size: 0.8rem; color: var(--neon-red); letter-spacing: 1px; }
+.paper-title { 
+    font-weight: 800; 
+    font-size: 1.4rem; 
+    margin: 10px 0 20px 0; 
+    line-height: 1.3;
+    /* Efek neon subtle pada judul */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.paper-card:hover .paper-title {
+    text-shadow: 
+        0 0 10px rgba(255, 26, 26, 0.8),
+        0 0 20px rgba(255, 26, 26, 0.5),
+        0 0 30px rgba(255, 26, 26, 0.3);
+    color: #ffffff;
+}
+
+/* Card Bottom Layout (Flex untuk Teks kiri, Radar kanan) */
+.card-bottom-layout { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; flex-grow: 1; }
+.tags .tag {
+    display: inline-block; background: rgba(255, 26, 26, 0.1);
+    color: var(--neon-red); border: 1px solid var(--neon-red);
+    padding: 4px 10px; font-size: 0.7rem; font-weight: 600; margin-right: 5px; font-family: var(--font-tech);
+}
+.conference { color: var(--text-secondary); font-size: 0.9rem; margin-top: 10px; }
+
+/* --- PAPER ATTRIBUTE RADAR (SVG Styling) --- */
+.radar-container { width: 80px; height: 80px; position: relative; }
+.radar-svg { width: 100%; height: 100%; overflow: visible; }
+.radar-grid { fill: none; stroke: rgba(255, 255, 255, 0.1); stroke-width: 0.5; }
+.radar-data {
+    fill: rgba(255, 26, 26, 0.3); /* Isi merah transparan */
+    stroke: var(--neon-red); stroke-width: 1.5;
+    filter: drop-shadow(0 0 5px var(--neon-red));
+    transition: all 0.5s ease;
+}
+.paper-card:hover .radar-data { fill: rgba(255, 26, 26, 0.5); }
+.radar-labels {
+    display: flex; justify-content: space-between; position: absolute; bottom: -15px; width: 100%;
+    font-family: var(--font-tech); font-size: 0.6rem; color: var(--text-secondary);
+}
+
+.btn-access {
+    display: block; text-align: center; width: 100%;
+    background: transparent; border: 1px solid var(--neon-red);
+    color: var(--neon-red); padding: 12px 0; font-weight: 800; letter-spacing: 2px;
+    text-decoration: none; transition: all 0.3s; font-family: var(--font-tech);
+    position: relative; overflow: hidden; z-index: 10;
+}
+.btn-access:hover { background: var(--neon-red); color: var(--bg-core); box-shadow: 0 0 20px var(--neon-glow); }
+
+/* --- MORPHING TRANSITION OVERLAY --- */
+/* --- EDIT BAGIAN INI DI STYLE.CSS --- */
+
+/* MORPH OVERLAY (Tirai Merah) */
+/* --- EDIT STYLE.CSS: DATA DIVE TRANSITION --- */
+
+/* 1. OVERLAY TRANSISI (Bukan lagi kotak solid, tapi efek flash/zoom) */
+.morph-overlay {
+    position: fixed;
+    z-index: 9999;
+    background: var(--neon-red);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: center center;
+    border-radius: 8px;
+    
+    /* Kita gunakan Scale, bukan Width/Height agar performa lebih mulus (GPU Accelerated) */
+    transition: 
+        transform 0.6s cubic-bezier(0.7, 0, 0.2, 1),
+        opacity 0.4s ease-in;
+}
+
+/* Saat aktif: Zoom membesar 50x lipat (memenuhi layar) dan memudar */
+.morph-active {
+    opacity: 0.9 !important; /* Jangan 100% solid, biar terlihat tembus pandang dikit */
+    transform: scale(50) !important; /* Zoom in ekstrem */
+}
+
+/* 2. EFEK MASUK HALAMAN BARU (ZOOM OUT/FADE IN) */
+/* Hapus animasi curtain lama, ganti dengan ini */
+.page-enter-curtain {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: #000; /* Layar hitam sesaat */
+    z-index: 10000;
+    pointer-events: none;
+    animation: zoomInPage 0.8s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+/* Animasi: Halaman baru muncul dari 'belakang' (Scale besar ke normal) */
+@keyframes zoomInPage {
+    0% { 
+        opacity: 1;
+        transform: scale(1.1); /* Sedikit di-zoom di awal */
+        filter: blur(10px);    /* Blur di awal */
+    }
+    100% { 
+        opacity: 0;
+        transform: scale(1);
+        filter: blur(0);
+        display: none; /* Hilangkan setelah selesai */
+    }
+}
+/* Responsive Fix */
+@media (max-width: 768px) {
+    .main-header h1 { font-size: 1.8rem; }
+    .card-bottom-layout { flex-direction: column; align-items: flex-start; }
+    .radar-container { margin-top: 20px; align-self: flex-end; }
+    .cursor-follower { display: none; /* Matikan custom cursor di HP */ }
+    body { cursor: auto; }
+}
+
+/* --- VIDEO RESPONSIVE CONTAINER --- */
+.video-frame {
+    position: relative;
+    padding-bottom: 56.25%; /* Rasio 16:9 */
+    height: 0;
+    overflow: hidden;
+    background: #000;
+}
+.video-frame iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}

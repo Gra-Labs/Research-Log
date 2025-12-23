@@ -1,0 +1,80 @@
+[
+    {
+        "log_id": "001",
+        "filename": "001-graph-slam.html",
+        "title": "A Tutorial on Graph-Based SLAM",
+        "authors": "Giorgio Grisetti, Rainer Kümmerle, Cyrill Stachniss, Wolfram Burgard",
+        "publication": "IEEE Intelligent Transportation Systems Magazine (2010)",
+        "tags": [
+            "SLAM",
+            "Graph Optimization",
+            "Tutorial",
+            "Backend"
+        ],
+        "summary_problem": "SLAM (Simultaneous Localization and Mapping) requires optimizing robot poses and landmark positions jointly. Traditional approaches using filtering methods suffer from computational complexity and inconsistent estimates, especially in large-scale environments with loop closures.",
+        "summary_solution": "The paper presents a comprehensive tutorial on graph-based SLAM, where the problem is formulated as a graph optimization. Nodes represent robot poses, edges represent spatial constraints from odometry or loop closures. The goal is to find the configuration of nodes that best satisfies all constraints, typically solved using nonlinear least squares optimization.",
+        "summary_result": "Graph-based SLAM provides a unified framework that is computationally efficient, scalable to large environments, and produces globally consistent maps. The tutorial covers frontend (data association) and backend (optimization) components, with clear explanations of key algorithms like Gauss-Newton and Levenberg-Marquardt optimization.",
+        "strengths": [
+            "Clear Tutorial: Provides an accessible introduction to graph-based SLAM with mathematical foundations.",
+            "Efficient Backend: Graph optimization is more efficient than filtering methods for large-scale SLAM.",
+            "Global Consistency: Produces globally consistent maps by optimizing all poses simultaneously.",
+            "Modular Framework: Separates frontend (data association) from backend (optimization)."
+        ],
+        "weaknesses": [
+            "Requires Loop Closure: Performance heavily depends on correct loop closure detection.",
+            "Sparse Representation: Typically produces sparse maps unless combined with dense mapping.",
+            "Initial Guess Dependency: Optimization requires good initial estimates to converge properly."
+        ],
+        "score_math": "95",
+        "score_code": "70",
+        "score_hw": "30",
+        "score_novelty": "75",
+        "radar_points": "50,12.0 78.0,50 50,62.0 20.0,50",
+        "dataset": "Intel Research Lab, MIT Killian Court",
+        "method_tech": "Graph Optimization, Least Squares, Gauss-Newton, Levenberg-Marquardt",
+        "video_id": "",
+        "image_file": "001-graph.png",
+        "image_caption": "Figure 1: Graph-based SLAM representation",
+        "pdf_file": "001-graph-slam.pdf",
+        "bibtex": "@article{grisetti2010tutorial,\n  title={A tutorial on graph-based SLAM},\n  author={Grisetti, Giorgio and K{\\\"u}mmerle, Rainer and Stachniss, Cyrill and Burgard, Wolfram},\n  journal={IEEE Intelligent Transportation Systems Magazine},\n  volume={2},\n  number={4},\n  pages={31--43},\n  year={2010},\n  publisher={IEEE}\n}"
+    },
+    {
+        "log_id": "002",
+        "filename": "002-orb-slam.html",
+        "title": "ORB-SLAM: a Versatile and Accurate Monocular SLAM System",
+        "authors": "Raúl Mur-Artal, J. M. M. Montiel, Juan D. Tardós",
+        "publication": "IEEE Transactions on Robotics (2015)",
+        "tags": [
+            "Visual SLAM",
+            "ORB Features",
+            "Real-time",
+            "Open Source"
+        ],
+        "summary_problem": "Previous monocular SLAM systems, such as PTAM, were limited to small-scale operations, lacked effective loop closing, and struggled with relocalization from different viewpoints. Furthermore, existing initialization methods often required human intervention or assumed planar scenes, while filtering approaches wasted computation on redundant frames.",
+        "summary_solution": "The authors propose a comprehensive system that uses ORB features for all tasks: tracking, mapping, relocalization, and loop closing, ensuring efficiency and invariance to viewpoint. The system introduces a \"survival of the fittest\" strategy for keyframe selection and an Essential Graph to perform real-time loop closing and optimization",
+        "summary_result": "ORB-SLAM achieves unprecedented accuracy and robustness across 27 sequences from major datasets (TUM, KITTI, NewCollege), outperforming state-of-the-art direct methods like LSD-SLAM. It operates in real-time on standard CPUs without GPU acceleration and provides a fully open-source implementation.",
+        "strengths": [
+            "Unified Feature System: Using ORB features for tracking, mapping, and place recognition simplifies the architecture and boosts efficiency.",
+            "Robust Initialization: Features an automatic initialization step that intelligently selects between homography (planar) and fundamental matrix (non-planar) models.",
+            "Lifelong Mapping: An aggressive keyframe culling policy removes redundant data, allowing the map to scale with scene content rather than time.",
+            "Efficient Optimization: The use of an Essential Graph (a sparse subgraph of the covisibility graph) enables accurate and fast loop closing."
+        ],
+        "weaknesses": [
+            "Sparse Reconstruction: As a feature-based method, it produces a sparse point cloud map, which is less informative for tasks like obstacle avoidance compared to dense or semi-dense maps from direct methods.",
+            "Texture Dependency: The system relies on corner features (FAST), making it potentially less robust in low-texture environments compared to direct methods that use pixel intensities.",
+            "Scale Ambiguity: Like all pure monocular systems, the absolute scale of the world is unobservable and can drift without specific correction mechanisms."
+        ],
+        "score_math": "85",
+        "score_code": "95",
+        "score_hw": "40",
+        "score_novelty": "90",
+        "radar_points": "50,16.0 88.0,50 50,66.0 14.0,50",
+        "dataset": "NewCollege, TUM RGB-D, KITTI",
+        "method_tech": "Bundle Adjustment, ORB Features, Covisibility Graph, Bag of Words (DBoW2).",
+        "video_id": "8p54FkZ8gq4",
+        "image_file": "002-arc.png",
+        "image_caption": "Figure 1. ORB-SLAM system overview",
+        "pdf_file": "002-annotated.pdf",
+        "bibtex": "@article{mur2015orb,\r\n  title={ORB-SLAM: a versatile and accurate monocular SLAM system},\r\n  author={Mur-Artal, Ra{\\'u}l and Montiel, Jose Maria Martinez and Tard{\\'o}s, Juan D},\r\n  journal={IEEE Transactions on Robotics},\r\n  volume={31},\r\n  number={5},\r\n  pages={1147--1163},\r\n  year={2015},\r\n  publisher={IEEE}\r\n}"
+    }
+]
