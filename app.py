@@ -18,6 +18,35 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # Max 16MB per file
 def allowed_file(filename, allowed_extensions):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
+def parse_benchmark(benchmark_text):
+    """Parse benchmark CSV format: Metric | Our Score | Competitor Score"""
+    benchmarks = []
+    if not benchmark_text:
+        return benchmarks
+    
+    lines = benchmark_text.strip().split('\n')
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        
+        parts = [part.strip() for part in line.split('|')]
+        if len(parts) >= 3:
+            benchmarks.append({
+                'metric': parts[0],
+                'ours': parts[1],
+                'competitor': parts[2]
+            })
+        elif len(parts) == 2:
+            # Jika hanya 2 kolom, asumsikan tidak ada competitor
+            benchmarks.append({
+                'metric': parts[0],
+                'ours': parts[1],
+                'competitor': '-'
+            })
+    
+    return benchmarks
+
 # Fungsi untuk menghitung titik polygon Radar Chart
 def calculate_radar_points(math, code, hw, novelty):
     # Mapping nilai 0-100 ke koordinat SVG box 100x100 (Center 50,50)
@@ -75,6 +104,10 @@ def generate():
         # Memecah text area per baris menjadi list
         "strengths": [s.strip() for s in data['strengths'].split('\n') if s.strip()],
         "weaknesses": [w.strip() for w in data['weaknesses'].split('\n') if w.strip()],
+        # Algorithm Logic - pecah per baris
+        "algorithm_logic": [step.strip() for step in data.get('algorithm_logic', '').split('\n') if step.strip()],
+        # Performance Benchmark - parse CSV format
+        "performance_benchmark": parse_benchmark(data.get('performance_benchmark', '')),
         "score_math": data['score_math'],
         "score_code": data['score_code'],
         "score_hw": data['score_hw'],

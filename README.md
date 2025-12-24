@@ -105,7 +105,28 @@ Contoh: Log ID `003` + upload `diagram.png` → `003-arch.png`
 - 💡 Neon red glowing text effects
 - 📊 Dynamic radar charts for each paper
 - 🔍 Search functionality
-- 📱 Responsive design
+- 📱 Responsive design (Mobile optimized)
+- 📤 **File upload with auto-naming**
+- 👀 **Live image preview**
+- 💾 **Smart file management**
+- 📝 **Algorithm Core Logic display** ✨ NEWEST
+- 🎯 **Performance Benchmark HUD** ✨ NEWEST
+
+## 📱 Mobile Optimization
+
+Website sudah dioptimalkan untuk Android/iOS:
+- ✅ Responsive grid layout
+- ✅ Touch-friendly interactions
+- ✅ Performance optimizations
+- ✅ Disabled heavy effects on mobile
+
+Lihat: [MOBILE_OPTIMIZATION.md](MOBILE_OPTIMIZATION.md)
+
+## 📚 Documentation
+
+- [File Upload Guide](FILE_UPLOAD_GUIDE.md) - Cara menggunakan fitur upload
+- [Mobile Optimization](MOBILE_OPTIMIZATION.md) - Detail optimasi mobile
+- [Algorithm & Benchmark Guide](ALGORITHM_BENCHMARK_GUIDE.md) - Fitur Algorithm Logic & Performance Benchmark ✨ NEW
 
 ---
 *Press Ctrl+C to stop any running server*

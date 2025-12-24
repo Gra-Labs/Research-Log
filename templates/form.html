@@ -298,6 +298,24 @@
 
             <hr>
 
+            <h3>// ALGORITHM CORE LOGIC</h3>
+            <div class="form-group">
+                <label>ALGORITHM STEPS (Satu langkah per baris)</label>
+                <textarea name="algorithm_logic" style="height: 180px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; line-height: 1.8;" placeholder="1. Initialize pose estimation from previous frame&#10;2. Extract ORB features from current image&#10;3. Match features with map points using RANSAC&#10;4. Optimize camera pose using bundle adjustment&#10;5. Update local map with new keyframes"></textarea>
+                <small style="color: #888;">Tip: Tulis pseudocode atau langkah algoritma utama paper ini</small>
+            </div>
+
+            <hr>
+
+            <h3>// PERFORMANCE BENCHMARK</h3>
+            <div class="form-group">
+                <label>BENCHMARK RESULTS (Format: Metric Name | Our Score | Competitor Score)</label>
+                <textarea name="performance_benchmark" style="height: 150px; font-family: 'JetBrains Mono', monospace; font-size: 0.95rem;" placeholder="ATE RMSE (cm) | 0.30 | 2.15&#10;RPE Translation (%) | 0.18 | 1.42&#10;Loop Closure Recall (%) | 95.3 | 87.1&#10;Tracking Success Rate (%) | 99.2 | 94.8&#10;Runtime (ms/frame) | 28 | 45"></textarea>
+                <small style="color: #888;">Format: Nama Metrik | Score Kita | Score Baseline/SOTA (pisahkan dengan |)</small>
+            </div>
+
+            <hr>
+
             <h3>// RADAR SCORES (0 - 100)</h3>
             <div class="grid-4">
                 <div class="form-group"><label>MATH</label><input type="number" name="score_math" value="50"></div>

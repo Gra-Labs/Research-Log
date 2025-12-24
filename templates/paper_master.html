@@ -19,6 +19,7 @@
         .arch-img-container:hover img { transform: scale(1.02); }
         .video-frame { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; }
         .video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         @media (max-width: 900px) { .review-grid { grid-template-columns: 1fr; } .analysis-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -64,6 +65,29 @@
                         </div>
                     </div>
                 </div>
+
+                {% if algorithm_logic %}
+                <div class="paper-card" style="margin-bottom: 40px; cursor: default; transform: none !important;">
+                    <div class="card-inner" style="padding: 0; background: #000;">
+                        <div style="padding: 15px 20px; border-bottom: 1px solid rgba(255,26,26,0.3); background: rgba(255, 26, 26, 0.05);">
+                            <h2 style="color: #ff3333; margin: 0; font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 2px;">// ALGORITHM_CORE.execute()</h2>
+                        </div>
+                        <div style="padding: 25px; background: #0a0a0a;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.9; color: #d0d7de;">
+                                {% for step in algorithm_logic %}
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">{{ loop.index }}</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">{{ step }}</code>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div style="padding: 10px 20px; border-top: 1px solid rgba(255,26,26,0.2); background: rgba(0,0,0,0.5); font-family: var(--font-tech); font-size: 0.7rem; color: #666;">
+                            <span style="color: #ff3333;">●</span> CORE_ALGORITHM_LOADED <span style="color: #0f0; margin-left: 10px;">✓ {{ algorithm_logic|length }} STEPS</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
                 <div class="analysis-grid">
                     <div class="paper-card" style="cursor: default;">
@@ -143,6 +167,42 @@
                         </div>
                     </div>
                 </div>
+
+                {% if performance_benchmark %}
+                <div class="paper-card" style="margin-bottom: 30px; cursor: default;">
+                    <div class="card-inner" style="padding: 0;">
+                        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,26,26,0.3); background: rgba(255, 26, 26, 0.05);">
+                            <h3 style="font-family: var(--font-tech); font-size: 0.75rem; color: #ff3333; margin: 0; letter-spacing: 2px; display: flex; align-items: center; gap: 8px;">
+                                <span style="display: inline-block; width: 6px; height: 6px; background: #0f0; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                                SYSTEM_DIAGNOSTICS
+                            </h3>
+                        </div>
+                        <div style="padding: 20px 15px; background: rgba(0,0,0,0.5);">
+                            {% for bench in performance_benchmark %}
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    {{ bench.metric }}
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">{{ bench.ours }}</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">{{ bench.competitor }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div style="padding: 10px 15px; border-top: 1px solid rgba(255,26,26,0.2); background: rgba(0,0,0,0.8); font-family: var(--font-tech); font-size: 0.65rem; color: #666; display: flex; justify-content: space-between; align-items: center;">
+                            <span><span style="color: #0f0;">●</span> LIVE_METRICS</span>
+                            <span style="color: #888;">{{ performance_benchmark|length }} RECORDS</span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
 
                 <a href="../assets/pdf/{{ pdf_file }}" class="btn-access" target="_blank" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
                     OPEN ANNOTATED PDF
