@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review: LM-Nav: Robotic Navigation with Large Pre-Trained Models of Language, Vision, and Action</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body { font-size: 16px; }
+        p, li { color: #d0d7de; font-weight: 400; font-size: 1.05rem; line-height: 1.7; }
+        h2 { font-size: 1.2rem; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        h2::before { content: ''; display: block; width: 4px; height: 18px; background: var(--neon-red); }
+        .review-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; align-items: start; }
+        .radar-box { display: flex; justify-content: center; padding: 20px 0; }
+        .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-top: 30px; margin-left: 0; margin-right: 60px; max-width: 100%; }
+        .arch-img-container { position: relative; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
+        .arch-img-container img { width: 100%; height: auto; display: block; transition: transform 0.3s; }
+        .arch-img-container:hover img { transform: scale(1.02); }
+        .video-frame { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; }
+        .video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        
+        /* FULL WIDTH ANALYSIS LAYOUT */
+        .analysis-full-container {
+            width: 100%;
+            margin-top: 60px;
+            padding-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .analysis-grid-wide {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @media (max-width: 900px) { 
+            .review-grid { grid-template-columns: 1fr; } 
+            .analysis-grid { grid-template-columns: 1fr; }
+            .analysis-grid-wide { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-enter-curtain"></div>
+    <div class="cursor-follower"></div>
+    <canvas id="bg-canvas"></canvas>
+
+    <nav style="position: fixed; top: 0; width: 100%; padding: 20px 40px; z-index: 100; display: flex; justify-content: space-between; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); backdrop-filter: blur(5px);">
+        <a href="../index.html" style="color: var(--neon-red); text-decoration: none; font-family: var(--font-tech); font-weight: bold; font-size: 0.9rem;">&lt; // RETURN_TO_DATABASE</a>
+        <span style="color: var(--text-secondary); font-family: var(--font-tech); font-size: 0.9rem; opacity: 0.7;">LOG_ID: 003</span>
+    </nav>
+
+    <main class="container" style="margin-top: 100px; padding-bottom: 80px;">
+        <header style="margin-bottom: 60px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 30px;">
+            <div class="tags" style="margin-bottom: 20px;">
+                
+                <span class="tag">VLM</span>
+                
+                <span class="tag">LLM</span>
+                
+                <span class="tag">Navigation</span>
+                
+                <span class="tag">Zero-Shot</span>
+                
+                <span class="tag">Robot Learning</span>
+                
+            </div>
+            <h1 style="font-size: 3rem; line-height: 1.1; margin-bottom: 15px; color: #fff; letter-spacing: -1px;">LM-Nav: Robotic Navigation with Large Pre-Trained Models of Language, Vision, and Action</h1>
+            <p style="color: var(--text-secondary); font-size: 1.2rem; max-width: 800px;">
+                <span style="color: var(--neon-red);">Dhruv Shah, Błażej Osiński, Brian Ichter, Sergey Levine</span> • arXiv (2022) / Robotics at Google
+            </p>
+        </header>
+
+        <div class="review-grid">
+            <div class="main-content">
+                <div class="paper-card" style="margin-bottom: 40px; cursor: default; transform: none !important;">
+                    <div class="card-inner" style="padding: 35px;">
+                        <h2 style="color: #fff; margin-top: 0;">EXECUTIVE SUMMARY</h2>
+                        <div style="margin-bottom: 25px;">
+                            <strong style="color: var(--neon-red); font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 1px; display: block; margin-bottom: 8px;">// THE PROBLEM</strong>
+                            <p>Existing robotic navigation methods typically require expensive language-annotated datasets for training or rely on unnatural interfaces like goal images or GPS coordinates. There is no efficient way to utilize natural language instructions without heavy fine-tuning or manual annotation</p>
+                        </div>
+                        <div style="margin-bottom: 25px;">
+                            <strong style="color: var(--neon-red); font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 1px; display: block; margin-bottom: 8px;">// THE SOLUTION</strong>
+                            <p>The authors propose LM-Nav, a system that combines three large pre-trained models without any fine-tuning: GPT-3 (LLM) to parse text instructions into landmarks, CLIP (VLM) to ground these landmarks in visual observations, and ViNG (VNM) for visual navigation control. A probabilistic graph search is used to find the optimal path connecting these components.</p>
+                        </div>
+                        <div>
+                            <strong style="color: var(--neon-red); font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 1px; display: block; margin-bottom: 8px;">// THE RESULT</strong>
+                            <p>The system successfully navigates a robot in complex outdoor environments (e.g., campus parks) using free-form natural language instructions. It can traverse hundreds of meters and disambiguate routes based on detailed commands, all without ever seeing labeled language-navigation data before.</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="paper-card" style="margin-bottom: 40px; cursor: default; transform: none !important;">
+                    <div class="card-inner" style="padding: 0; background: #000;">
+                        <div style="padding: 15px 20px; border-bottom: 1px solid rgba(255,26,26,0.3); background: rgba(255, 26, 26, 0.05);">
+                            <h2 style="color: #ff3333; margin: 0; font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 2px;">// ALGORITHM_CORE.execute()</h2>
+                        </div>
+                        <div style="padding: 25px; background: #0a0a0a;">
+                            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.9; color: #d0d7de;">
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">1</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">// CORE_LOGIC: PROBABILISTIC_GRAPH_SEARCH</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">2</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">1. INPUT_PROCESSING:</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">3</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">- Instructions -&gt; LLM (GPT-3) -&gt; Landmarks List (L)</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">4</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">- Observations -&gt; VNM (ViNG) -&gt; Topological Graph G(V,E)</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">5</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">2. GROUNDING_DISTRIBUTION (Pre-computation):</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">6</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">FOR EACH Node v in G AND Landmark l in L:</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">7</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">- P_ground(v|l) = VLM_CLIP(Image_v, Text_l)</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">8</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">3. OPTIMAL_WALK_SEARCH (Dynamic Programming):</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">9</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">Initialize Q[0, StartNode] = 0</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">10</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">FOR i = 1 TO num_landmarks:</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">11</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">FOR EACH Node v in G:</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">12</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;"># Maximize prob of grounding - travel cost</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">13</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">Q[i,v] = max(Q[i-1, u] + log(P_ground) - dist(u,v))</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">14</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">4. EXECUTION:</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">15</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">- Path = Backtrack(argmax(Q[end]))</code>
+                                </div>
+                                
+                                <div style="display: grid; grid-template-columns: 40px 1fr; gap: 15px; margin-bottom: 8px; padding: 8px 0; border-left: 2px solid rgba(255,26,26,0.2); padding-left: 15px;">
+                                    <span style="color: #666; text-align: right; font-size: 0.8rem; user-select: none;">16</span>
+                                    <code style="color: #00ff88; background: transparent; padding: 0; border-radius: 0;">- Robot_Action = VNM_Controller(Path)</code>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div style="padding: 10px 20px; border-top: 1px solid rgba(255,26,26,0.2); background: rgba(0,0,0,0.5); font-family: var(--font-tech); font-size: 0.7rem; color: #666;">
+                            <span style="color: #ff3333;">●</span> CORE_ALGORITHM_LOADED <span style="color: #0f0; margin-left: 10px;">✓ 16 STEPS</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="sidebar">
+                <div class="paper-card" style="margin-bottom: 30px; text-align: center;">
+                    <div class="card-inner">
+                        <h3 style="font-family: var(--font-tech); font-size: 0.85rem; color: var(--text-secondary); margin: 0 0 10px 0; letter-spacing: 2px;">ATTRIBUTE RADAR</h3>
+                        <div class="radar-box">
+                            <div style="width: 220px; height: 220px; position: relative;">
+                                <svg viewBox="0 0 100 100" style="width: 100%; height: 100%; overflow: visible;">
+                                    <polygon points="50,10 90,50 50,90 10,50" fill="none" stroke="#333" stroke-width="0.5"></polygon>
+                                    <polygon points="50,25 75,50 50,75 25,50" fill="none" stroke="#333" stroke-width="0.5"></polygon>
+                                    <line x1="50" y1="10" x2="50" y2="90" stroke="#333" stroke-width="0.5"></line>
+                                    <line x1="10" y1="50" x2="90" y2="50" stroke="#333" stroke-width="0.5"></line>
+                                    <polygon points="50,22.0 84.0,50 50,74.0 12.0,50" fill="rgba(255, 26, 26, 0.2)" stroke="var(--neon-red)" stroke-width="2" filter="drop-shadow(0 0 8px var(--neon-red))"></polygon>
+                                    
+                                    <text x="50" y="5" fill="#fff" font-size="7" font-weight="bold" text-anchor="middle" font-family="var(--font-tech)">MATH (70)</text>
+                                    <text x="95" y="52" fill="#fff" font-size="7" font-weight="bold" text-anchor="start" font-family="var(--font-tech)">CODE (85)</text>
+                                    <text x="50" y="98" fill="#fff" font-size="7" font-weight="bold" text-anchor="middle" font-family="var(--font-tech)">HARDWARE (60)</text>
+                                    <text x="5" y="52" fill="#fff" font-size="7" font-weight="bold" text-anchor="end" font-family="var(--font-tech)">NOVELTY (95)</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem;">
+                                <span style="color: var(--text-secondary);">Dataset</span>
+                                <span style="color: #fff; font-family: var(--font-tech);">Self-supervised navigation data (ViNG), no language-robot dataset.</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.85rem;">
+                                <span style="color: var(--text-secondary);">Method</span>
+                                <span style="color: #fff; font-family: var(--font-tech);">LLM (GPT-3) + VLM (CLIP) + VNM (ViNG) + Graph Search.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="paper-card" style="margin-bottom: 30px; padding: 0; overflow: hidden;">
+                    <div class="card-inner" style="padding: 0;">
+                        <div style="padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); background: rgba(255, 26, 26, 0.05);">
+                            <h3 style="font-family: var(--font-tech); font-size: 0.75rem; color: var(--neon-red); margin: 0; letter-spacing: 2px;">▶ VIDEO_LOG_ENTRY</h3>
+                        </div>
+                        <div class="video-frame">
+                            <iframe src="https://www.youtube.com/embed/-?rel=0&modestbranding=1" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="paper-card" style="margin-bottom: 30px; padding: 0; overflow: hidden;">
+                    <div class="card-inner" style="padding: 0;">
+                        <div class="arch-img-container">
+                            <img src="../assets/img/003-arch.png" alt="Architecture">
+                        </div>
+                        <div style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0; text-align: center;">Figure 3: System overview</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="paper-card" style="margin-bottom: 30px; cursor: default;">
+                    <div class="card-inner" style="padding: 0;">
+                        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,26,26,0.3); background: rgba(255, 26, 26, 0.05);">
+                            <h3 style="font-family: var(--font-tech); font-size: 0.75rem; color: #ff3333; margin: 0; letter-spacing: 2px; display: flex; align-items: center; gap: 8px;">
+                                <span style="display: inline-block; width: 6px; height: 6px; background: #0f0; border-radius: 50%; animation: pulse 2s infinite;"></span>
+                                SYSTEM_DIAGNOSTICS
+                            </h3>
+                        </div>
+                        <div style="padding: 20px 15px; background: rgba(0,0,0,0.5);">
+                            
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    Nav Success Rate (EnvSmall)
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">80%</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">23%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    Disengagement Rate (Lower=Better)
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">0.1</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">0.75</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    Landmark Detection (VLM)
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">87%</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">38%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    Instruction Parsing (LLM)
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">100%</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">76%</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 18px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <div style="font-size: 0.75rem; color: #888; font-family: var(--font-tech); margin-bottom: 8px; letter-spacing: 0.5px;">
+                                    Planning Efficiency
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                                    <div style="background: rgba(0, 255, 100, 0.05); border: 1px solid rgba(0, 255, 100, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #0f0; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">OURS</div>
+                                        <div style="font-size: 1.1rem; color: #0f0; font-weight: bold; font-family: var(--font-tech); text-shadow: 0 0 10px rgba(0,255,100,0.3);">0.96</div>
+                                    </div>
+                                    <div style="background: rgba(255, 50, 50, 0.05); border: 1px solid rgba(255, 50, 50, 0.3); padding: 8px 10px; border-radius: 4px;">
+                                        <div style="font-size: 0.65rem; color: #f87171; font-family: var(--font-tech); margin-bottom: 3px; opacity: 0.7;">BASELINE</div>
+                                        <div style="font-size: 1.1rem; color: #f87171; font-weight: bold; font-family: var(--font-tech);">0.93</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div style="padding: 10px 15px; border-top: 1px solid rgba(255,26,26,0.2); background: rgba(0,0,0,0.8); font-family: var(--font-tech); font-size: 0.65rem; color: #666; display: flex; justify-content: space-between; align-items: center;">
+                            <span><span style="color: #0f0;">●</span> LIVE_METRICS</span>
+                            <span style="color: #888;">5 RECORDS</span>
+                        </div>
+                    </div>
+                </div>
+                
+
+                <a href="../assets/pdf/003-annotated.pdf" class="btn-access" target="_blank" style="margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    OPEN ANNOTATED PDF
+                </a>
+
+                <div class="paper-card">
+                    <div class="card-inner" style="padding: 15px;">
+                        <h3 style="font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 10px 0; font-family: var(--font-tech);">BIBTEX SOURCE</h3>
+                        <pre style="background: rgba(0,0,0,0.5); padding: 10px; border-radius: 4px; overflow-x: auto; font-family: 'JetBrains Mono'; font-size: 0.65rem; color: #888; border: 1px solid rgba(255,255,255,0.1); margin: 0;">@article{shah2022lmnav,
+  title={LM-Nav: Robotic Navigation with Large Pre-Trained Models of Language, Vision, and Action},
+  author={Shah, Dhruv and Osiński, Błażej and Ichter, Brian and Levine, Sergey},
+  journal={arXiv preprint arXiv:2207.04429},
+  year={2022}
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FULL WIDTH CRITICAL ANALYSIS -->
+        <div class="analysis-full-container">
+            <h2 style="color: #fff; font-size: 1.5rem; margin-bottom: 25px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px;">
+                <span style="display: block; width: 4px; height: 22px; background: var(--neon-red);"></span>
+                CRITICAL ANALYSIS
+            </h2>
+
+            <div class="analysis-grid-wide">
+                <div class="paper-card" style="cursor: default; height: 100%;">
+                    <div class="card-inner" style="padding: 30px;">
+                        <h3 style="color: #4ade80; font-size: 1.1rem; margin-top: 0; display: flex; justify-content: space-between; align-items: center;">STRENGTHS <span style="font-size: 1.3rem;">+</span></h3>
+                        <ul style="padding-left: 20px; margin-bottom: 0; font-size: 1rem; line-height: 1.7;">
+                            
+                            <li><strong>+</strong> Zero-Shot / No Fine-Tuning: The system is constructed entirely from off-the-shelf pre-trained models (frozen weights), eliminating the need for re-training or expensive robot annotation data.</li>
+                            
+                            <li><strong>+</strong> Modular Architecture: The clear separation between language (LLM), vision (VLM), and navigation (VNM) modules allows each component to be upgraded independently.</li>
+                            
+                            <li><strong>+</strong> Robust Navigation: By using a self-supervised VNM (ViNG), the physical navigation is more robust to obstacles compared to pure GPS-based methods, as shown in ablation studies.</li>
+                            
+                        </ul>
+                    </div>
+                </div>
+                <div class="paper-card" style="cursor: default; height: 100%;">
+                    <div class="card-inner" style="padding: 30px;">
+                        <h3 style="color: #f87171; font-size: 1.1rem; margin-top: 0; display: flex; justify-content: space-between; align-items: center;">WEAKNESSES <span style="font-size: 1.3rem;">-</span></h3>
+                        <ul style="padding-left: 20px; margin-bottom: 0; font-size: 1rem; line-height: 1.7;">
+                            
+                            <li><strong>-</strong> Landmark Reliance: The system heavily relies on landmark detection (nouns) and tends to disregard verbs or specific action commands (e.g., &#34;walk slowly&#34;, &#34;avoid the dog&#34;).</li>
+                            
+                            <li><strong>-</strong> VLM Limitations: Navigation capabilities are bounded by the VLM&#39;s (CLIP) ability to recognize specific objects. The paper notes detection failures for objects like fire hydrants, which can lead to routing errors</li>
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    <script src="../script.js"></script>
+</body>
+</html>

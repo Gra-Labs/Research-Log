@@ -3,7 +3,7 @@
         "log_id": "001",
         "filename": "001-graph-slam.html",
         "title": "A Tutorial on Graph-Based SLAM",
-        "authors": "Giorgio Grisetti, Rainer Kümmerle, Cyrill Stachniss, Wolfram Burgard",
+        "authors": "Giorgio Grisetti, Rainer K\u00fcmmerle, Cyrill Stachniss, Wolfram Burgard",
         "publication": "IEEE Intelligent Transportation Systems Magazine (2010)",
         "tags": [
             "SLAM",
@@ -42,7 +42,7 @@
         "log_id": "002",
         "filename": "002-orb-slam.html",
         "title": "ORB-SLAM: a Versatile and Accurate Monocular SLAM System",
-        "authors": "Raúl Mur-Artal, J. M. M. Montiel, Juan D. Tardós",
+        "authors": "Ra\u00fal Mur-Artal, J. M. M. Montiel, Juan D. Tard\u00f3s",
         "publication": "IEEE Transactions on Robotics (2015)",
         "tags": [
             "Visual SLAM",
@@ -76,5 +76,88 @@
         "image_caption": "Figure 1. ORB-SLAM system overview",
         "pdf_file": "002-annotated.pdf",
         "bibtex": "@article{mur2015orb,\r\n  title={ORB-SLAM: a versatile and accurate monocular SLAM system},\r\n  author={Mur-Artal, Ra{\\'u}l and Montiel, Jose Maria Martinez and Tard{\\'o}s, Juan D},\r\n  journal={IEEE Transactions on Robotics},\r\n  volume={31},\r\n  number={5},\r\n  pages={1147--1163},\r\n  year={2015},\r\n  publisher={IEEE}\r\n}"
+    },
+    {
+        "log_id": "003",
+        "filename": "003-lm-nav.html",
+        "title": "LM-Nav: Robotic Navigation with Large Pre-Trained Models of Language, Vision, and Action",
+        "authors": "Dhruv Shah, B\u0142a\u017cej Osi\u0144ski, Brian Ichter, Sergey Levine",
+        "publication": "arXiv (2022) / Robotics at Google",
+        "tags": [
+            "VLM",
+            "LLM",
+            "Navigation",
+            "Zero-Shot",
+            "Robot Learning"
+        ],
+        "summary_problem": "Existing robotic navigation methods typically require expensive language-annotated datasets for training or rely on unnatural interfaces like goal images or GPS coordinates. There is no efficient way to utilize natural language instructions without heavy fine-tuning or manual annotation",
+        "summary_solution": "The authors propose LM-Nav, a system that combines three large pre-trained models without any fine-tuning: GPT-3 (LLM) to parse text instructions into landmarks, CLIP (VLM) to ground these landmarks in visual observations, and ViNG (VNM) for visual navigation control. A probabilistic graph search is used to find the optimal path connecting these components.",
+        "summary_result": "The system successfully navigates a robot in complex outdoor environments (e.g., campus parks) using free-form natural language instructions. It can traverse hundreds of meters and disambiguate routes based on detailed commands, all without ever seeing labeled language-navigation data before.",
+        "strengths": [
+            "Zero-Shot / No Fine-Tuning: The system is constructed entirely from off-the-shelf pre-trained models (frozen weights), eliminating the need for re-training or expensive robot annotation data.",
+            "Modular Architecture: The clear separation between language (LLM), vision (VLM), and navigation (VNM) modules allows each component to be upgraded independently.",
+            "Robust Navigation: By using a self-supervised VNM (ViNG), the physical navigation is more robust to obstacles compared to pure GPS-based methods, as shown in ablation studies."
+        ],
+        "weaknesses": [
+            "Landmark Reliance: The system heavily relies on landmark detection (nouns) and tends to disregard verbs or specific action commands (e.g., \"walk slowly\", \"avoid the dog\").",
+            "VLM Limitations: Navigation capabilities are bounded by the VLM's (CLIP) ability to recognize specific objects. The paper notes detection failures for objects like fire hydrants, which can lead to routing errors"
+        ],
+        "algorithm_logic": [
+            "// CORE_LOGIC: PROBABILISTIC_GRAPH_SEARCH",
+            "1. INPUT_PROCESSING:",
+            "- Instructions -> LLM (GPT-3) -> Landmarks List (L)",
+            "- Observations -> VNM (ViNG) -> Topological Graph G(V,E)",
+            "2. GROUNDING_DISTRIBUTION (Pre-computation):",
+            "FOR EACH Node v in G AND Landmark l in L:",
+            "- P_ground(v|l) = VLM_CLIP(Image_v, Text_l)",
+            "3. OPTIMAL_WALK_SEARCH (Dynamic Programming):",
+            "Initialize Q[0, StartNode] = 0",
+            "FOR i = 1 TO num_landmarks:",
+            "FOR EACH Node v in G:",
+            "# Maximize prob of grounding - travel cost",
+            "Q[i,v] = max(Q[i-1, u] + log(P_ground) - dist(u,v))",
+            "4. EXECUTION:",
+            "- Path = Backtrack(argmax(Q[end]))",
+            "- Robot_Action = VNM_Controller(Path)"
+        ],
+        "performance_benchmark": [
+            {
+                "metric": "Nav Success Rate (EnvSmall)",
+                "ours": "80%",
+                "competitor": "23%"
+            },
+            {
+                "metric": "Disengagement Rate (Lower=Better)",
+                "ours": "0.1",
+                "competitor": "0.75"
+            },
+            {
+                "metric": "Landmark Detection (VLM)",
+                "ours": "87%",
+                "competitor": "38%"
+            },
+            {
+                "metric": "Instruction Parsing (LLM)",
+                "ours": "100%",
+                "competitor": "76%"
+            },
+            {
+                "metric": "Planning Efficiency",
+                "ours": "0.96",
+                "competitor": "0.93"
+            }
+        ],
+        "score_math": "70",
+        "score_code": "85",
+        "score_hw": "60",
+        "score_novelty": "95",
+        "radar_points": "50,22.0 84.0,50 50,74.0 12.0,50",
+        "dataset": "Self-supervised navigation data (ViNG), no language-robot dataset.",
+        "method_tech": "LLM (GPT-3) + VLM (CLIP) + VNM (ViNG) + Graph Search.",
+        "video_id": "-",
+        "image_file": "003-arch.png",
+        "image_caption": "",
+        "pdf_file": "003-annotated.pdf",
+        "bibtex": "@article{shah2022lmnav,\r\n  title={LM-Nav: Robotic Navigation with Large Pre-Trained Models of Language, Vision, and Action},\r\n  author={Shah, Dhruv and Osi\u0144ski, B\u0142a\u017cej and Ichter, Brian and Levine, Sergey},\r\n  journal={arXiv preprint arXiv:2207.04429},\r\n  year={2022}\r\n}"
     }
 ]
