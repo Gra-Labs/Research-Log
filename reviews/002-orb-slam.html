@@ -11,7 +11,7 @@
         p, li { color: #d0d7de; font-weight: 400; font-size: 1.05rem; line-height: 1.7; }
         h2 { font-size: 1.2rem; letter-spacing: 1px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
         h2::before { content: ''; display: block; width: 4px; height: 18px; background: var(--neon-red); }
-        .review-grid { display: grid; grid-template-columns: 1.8fr 1fr; gap: 40px; align-items: start; }
+        .review-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 35px; align-items: start; }
         .radar-box { display: flex; justify-content: center; padding: 20px 0; }
         .analysis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px; }
         .arch-img-container { position: relative; overflow: hidden; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); }
@@ -19,7 +19,121 @@
         .arch-img-container:hover img { transform: scale(1.02); }
         .video-frame { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; }
         .video-frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-        @media (max-width: 900px) { .review-grid { grid-template-columns: 1fr; } .analysis-grid { grid-template-columns: 1fr; } }
+
+        /* --- ALGORITHM & BENCHMARK STYLES --- */
+        .algo-container {
+            background: linear-gradient(135deg, rgba(0,20,0,0.4), rgba(0,40,0,0.2));
+            border: 1px solid rgba(0,255,136,0.3);
+            border-radius: 8px;
+            padding: 0;
+            margin: 35px 0;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 0 20px rgba(0,255,136,0.1);
+        }
+        .algo-header {
+            padding: 12px 18px;
+            background: rgba(0,255,136,0.05);
+            border-bottom: 1px solid rgba(0,255,136,0.2);
+            color: #00ff88;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .algo-body {
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .algo-line {
+            display: flex;
+            line-height: 1.8;
+            font-size: 0.82rem;
+            margin-bottom: 2px;
+        }
+        .line-num {
+            color: rgba(0,255,136,0.4);
+            width: 38px;
+            text-align: right;
+            margin-right: 18px;
+            user-select: none;
+            font-size: 0.75rem;
+        }
+        .line-code {
+            color: #00ff88;
+            flex: 1;
+        }
+        .indent-1 { padding-left: 25px; }
+        .indent-2 { padding-left: 50px; }
+
+        /* HUD BENCHMARK STYLE */
+        .hud-container {
+            background: linear-gradient(135deg, rgba(20,0,0,0.4), rgba(40,0,0,0.2));
+            border: 1px solid rgba(255,51,51,0.3);
+            border-radius: 8px;
+            padding: 22px;
+            margin-bottom: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 0 20px rgba(255,51,51,0.1);
+        }
+        .hud-title {
+            color: var(--neon-red);
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-bottom: 18px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .hud-row {
+            margin-bottom: 16px;
+        }
+        .hud-metric {
+            display: block;
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+        .hud-compare {
+            display: flex;
+            gap: 12px;
+        }
+        .score-box {
+            flex: 1;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid;
+        }
+        .score-box.win {
+            background: rgba(0,255,136,0.05);
+            border-color: rgba(0,255,136,0.3);
+        }
+        .score-box.lose {
+            background: rgba(255,51,51,0.05);
+            border-color: rgba(255,51,51,0.3);
+        }
+        .score-val {
+            display: block;
+            font-size: 1.05rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .score-val.green { color: #00ff88; }
+        .score-val.red { color: #ff3333; }
+        .score-label {
+            display: block;
+            font-size: 0.62rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 900px) { 
+            .review-grid { grid-template-columns: 1fr; } 
+            .analysis-grid { grid-template-columns: 1fr; }
+            .algo-body { max-height: 350px; padding: 15px; }
+            .hud-compare { flex-direction: column; gap: 8px; }
+        }
     </style>
 </head>
 <body>
@@ -68,6 +182,36 @@
                             <strong style="color: var(--neon-red); font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 1px; display: block; margin-bottom: 8px;">// THE RESULT</strong>
                             <p>ORB-SLAM achieves unprecedented accuracy and robustness across 27 sequences from major datasets (TUM, KITTI, NewCollege), outperforming state-of-the-art direct methods like LSD-SLAM. It operates in real-time on standard CPUs without GPU acceleration and provides a fully open-source implementation.</p>
                         </div>
+                    </div>
+                </div>
+
+                <!-- ALGORITHM CORE LOGIC -->
+                <div class="algo-container">
+                    <div class="algo-header">// ALGORITHM_CORE.execute(ORB_Feature_Tracking)</div>
+                    <div class="algo-body">
+                        <div class="algo-line"><span class="line-num">1</span><span class="line-code">INITIALIZATION:</span></div>
+                        <div class="algo-line"><span class="line-num">2</span><span class="line-code indent-1">Extract ORB features from stereo/monocular frames</span></div>
+                        <div class="algo-line"><span class="line-num">3</span><span class="line-code indent-1">Initialize map with first keyframe</span></div>
+                        <div class="algo-line"><span class="line-num">4</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">5</span><span class="line-code">FOR EACH new frame DO:</span></div>
+                        <div class="algo-line"><span class="line-num">6</span><span class="line-code indent-1"># a. Feature Extraction</span></div>
+                        <div class="algo-line"><span class="line-num">7</span><span class="line-code indent-1">features = Extract_ORB(frame, num_levels=8)</span></div>
+                        <div class="algo-line"><span class="line-num">8</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">9</span><span class="line-code indent-1"># b. Tracking (Motion Model + BoW)</span></div>
+                        <div class="algo-line"><span class="line-num">10</span><span class="line-code indent-1">matches = Match_Features(features, local_map)</span></div>
+                        <div class="algo-line"><span class="line-num">11</span><span class="line-code indent-1">pose = Optimize_Pose_PnP(matches)</span></div>
+                        <div class="algo-line"><span class="line-num">12</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">13</span><span class="line-code indent-1"># c. Keyframe Decision</span></div>
+                        <div class="algo-line"><span class="line-num">14</span><span class="line-code indent-1">IF Need_New_Keyframe(matches, pose):</span></div>
+                        <div class="algo-line"><span class="line-num">15</span><span class="line-code indent-2">Create_Keyframe(frame, pose)</span></div>
+                        <div class="algo-line"><span class="line-num">16</span><span class="line-code indent-2">Triangulate_New_MapPoints()</span></div>
+                        <div class="algo-line"><span class="line-num">17</span><span class="line-code indent-2">Local_Bundle_Adjustment()</span></div>
+                        <div class="algo-line"><span class="line-num">18</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">19</span><span class="line-code indent-1"># d. Loop Closure (DBoW2)</span></div>
+                        <div class="algo-line"><span class="line-num">20</span><span class="line-code indent-1">IF Loop_Detected():</span></div>
+                        <div class="algo-line"><span class="line-num">21</span><span class="line-code indent-2">Compute_Sim3()</span></div>
+                        <div class="algo-line"><span class="line-num">22</span><span class="line-code indent-2">Optimize_Essential_Graph()</span></div>
+                        <div class="algo-line"><span class="line-num">23</span><span class="line-code">END FOR</span></div>
                     </div>
                 </div>
 
@@ -135,6 +279,51 @@
                                 <span style="color: #fff; font-family: var(--font-tech);">Bundle Adjustment, ORB Features, Covisibility Graph, Bag of Words (DBoW2).</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- SYSTEM DIAGNOSTICS -->
+                <div class="hud-container">
+                    <h3 class="hud-title">● SYSTEM_DIAGNOSTICS</h3>
+                    
+                    <div class="hud-row">
+                        <span class="hud-metric">TRACKING ACCURACY (TUM fr2/desk)</span>
+                        <div class="hud-compare">
+                            <div class="score-box win">
+                                <span class="score-val green">0.009 m</span>
+                                <span class="score-label">ORB-SLAM</span>
+                            </div>
+                            <div class="score-box lose">
+                                <span class="score-val red">0.026 m</span>
+                                <span class="score-label">LSD-SLAM</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hud-row">
+                        <span class="hud-metric">REAL-TIME PERFORMANCE (KITTI 00)</span>
+                        <div class="hud-compare">
+                            <div class="score-box win">
+                                <span class="score-val green">30 Hz</span>
+                                <span class="score-label">MONOCULAR</span>
+                            </div>
+                            <div class="score-box win">
+                                <span class="score-val green">40 Hz</span>
+                                <span class="score-label">STEREO</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hud-row">
+                        <span class="hud-metric">LOOP CLOSURE DETECTION</span>
+                        <div class="score-box win" style="width: 100%; border-color: #444; background: rgba(255,255,255,0.05);">
+                            <span class="score-val" style="color: #fff;">DBoW2 + Essential Graph</span>
+                            <span class="score-label">VIEWPOINT INVARIANT</span>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.6rem; color: #444; text-align: right; margin-top: 10px;">
+                        STATUS: <span style="color: #00ff88;">REAL-TIME READY</span>
                     </div>
                 </div>
 

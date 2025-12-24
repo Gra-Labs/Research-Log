@@ -58,6 +58,109 @@
             top: 0; left: 0; width: 100%; height: 100%; border: 0;
         }
 
+        /* ALGORITHM TERMINAL STYLE */
+        .algo-container {
+            background: linear-gradient(135deg, rgba(0,20,0,0.4), rgba(0,40,0,0.2));
+            border: 1px solid rgba(0,255,136,0.3);
+            border-radius: 8px;
+            padding: 0;
+            margin: 30px 0;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 0 20px rgba(0,255,136,0.1);
+        }
+        .algo-header {
+            padding: 10px 15px;
+            background: rgba(0,255,136,0.05);
+            border-bottom: 1px solid rgba(0,255,136,0.2);
+            color: #00ff88;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+        }
+        .algo-body {
+            padding: 15px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .algo-line {
+            display: flex;
+            line-height: 1.6;
+            font-size: 0.85rem;
+        }
+        .line-num {
+            color: rgba(0,255,136,0.4);
+            width: 35px;
+            text-align: right;
+            margin-right: 15px;
+            user-select: none;
+        }
+        .line-code {
+            color: #00ff88;
+            flex: 1;
+        }
+        .indent-1 { padding-left: 30px; }
+        .indent-2 { padding-left: 60px; }
+
+        /* HUD BENCHMARK STYLE */
+        .hud-container {
+            background: linear-gradient(135deg, rgba(20,0,0,0.4), rgba(40,0,0,0.2));
+            border: 1px solid rgba(255,51,51,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            font-family: 'JetBrains Mono', monospace;
+            box-shadow: 0 0 20px rgba(255,51,51,0.1);
+        }
+        .hud-title {
+            color: var(--neon-red);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+        .hud-row {
+            margin-bottom: 15px;
+        }
+        .hud-metric {
+            display: block;
+            font-size: 0.65rem;
+            color: rgba(255,255,255,0.5);
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        .hud-compare {
+            display: flex;
+            gap: 10px;
+        }
+        .score-box {
+            flex: 1;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            border: 1px solid;
+        }
+        .score-box.win {
+            background: rgba(0,255,136,0.05);
+            border-color: rgba(0,255,136,0.3);
+        }
+        .score-box.lose {
+            background: rgba(255,51,51,0.05);
+            border-color: rgba(255,51,51,0.3);
+        }
+        .score-val {
+            display: block;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        .score-val.green { color: #00ff88; }
+        .score-val.red { color: #ff3333; }
+        .score-label {
+            display: block;
+            font-size: 0.6rem;
+            color: rgba(255,255,255,0.4);
+            letter-spacing: 1px;
+        }
+
         @media (max-width: 900px) {
             .review-grid { grid-template-columns: 1fr; }
             .analysis-grid { grid-template-columns: 1fr; }
@@ -112,6 +215,30 @@
                             <strong style="color: var(--neon-red); font-family: var(--font-tech); font-size: 0.85rem; letter-spacing: 1px; display: block; margin-bottom: 8px;">// THE RESULT</strong>
                             <p>A robust "Back-end" solution that exploits the sparse structure of the SLAM matrix. It demonstrates efficient map correction (e.g., Intel Lab, MIT Killian Court datasets) even with thousands of nodes, running in real-time on standard laptops.</p>
                         </div>
+                    </div>
+                </div>
+
+                <div class="algo-container">
+                    <div class="algo-header">// ALGORITHM_CORE.execute(Gauss-Newton)</div>
+                    <div class="algo-body">
+                        <div class="algo-line"><span class="line-num">1</span><span class="line-code">INITIALIZATION:</span></div>
+                        <div class="algo-line"><span class="line-num">2</span><span class="line-code indent-1">Set initial guess for poses (x)</span></div>
+                        <div class="algo-line"><span class="line-num">3</span><span class="line-code indent-1">Define error function e(x)</span></div>
+                        <div class="algo-line"><span class="line-num">4</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">5</span><span class="line-code">WHILE not converged DO:</span></div>
+                        <div class="algo-line"><span class="line-num">6</span><span class="line-code indent-1"># a. Linearize Error</span></div>
+                        <div class="algo-line"><span class="line-num">7</span><span class="line-code indent-1">J = Compute_Jacobians(x)</span></div>
+                        <div class="algo-line"><span class="line-num">8</span><span class="line-code indent-1">e = Compute_Error_Vector(x)</span></div>
+                        <div class="algo-line"><span class="line-num">9</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">10</span><span class="line-code indent-1"># b. Build Linear System (H Δx = -b)</span></div>
+                        <div class="algo-line"><span class="line-num">11</span><span class="line-code indent-1">H = J.T * Omega * J</span></div>
+                        <div class="algo-line"><span class="line-num">12</span><span class="line-code indent-1">b = J.T * Omega * e</span></div>
+                        <div class="algo-line"><span class="line-num">13</span><span class="line-code"></span></div>
+                        <div class="algo-line"><span class="line-num">14</span><span class="line-code indent-1"># c. Solve & Update</span></div>
+                        <div class="algo-line"><span class="line-num">15</span><span class="line-code indent-1">Fix_Gauge_Freedom(x_0)</span></div>
+                        <div class="algo-line"><span class="line-num">16</span><span class="line-code indent-1">dx = Cholesky_Solve(H, -b)</span></div>
+                        <div class="algo-line"><span class="line-num">17</span><span class="line-code indent-1">x_new = x_old + dx</span></div>
+                        <div class="algo-line"><span class="line-num">18</span><span class="line-code">END WHILE</span></div>
                     </div>
                 </div>
 
@@ -182,6 +309,50 @@
                                 <span style="color: #fff; font-family: var(--font-tech);">Gauss-Newton</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <div class="paper-card hud-container">
+                    <h3 class="hud-title">● SYSTEM_DIAGNOSTICS</h3>
+                    
+                    <div class="hud-row">
+                        <span class="hud-metric">OPTIMIZATION SPEED (Intel Core2)</span>
+                        <div class="hud-compare">
+                            <div class="score-box win">
+                                <span class="score-val green">100 ms</span>
+                                <span class="score-label">THIS WORK</span>
+                            </div>
+                            <div class="score-box lose">
+                                <span class="score-val red">> 500 ms</span>
+                                <span class="score-label">STANDARD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hud-row">
+                        <span class="hud-metric">GRAPH COMPLEXITY (Nodes/Edges)</span>
+                        <div class="score-box win" style="width: 100%; border-color: #444; background: rgba(255,255,255,0.05);">
+                            <span class="score-val" style="color: #fff;">1,802 / 3,546</span>
+                            <span class="score-label">INTEL LAB DATASET</span>
+                        </div>
+                    </div>
+
+                    <div class="hud-row">
+                        <span class="hud-metric">3D CONVERGENCE</span>
+                        <div class="hud-compare">
+                            <div class="score-box win">
+                                <span class="score-val green">YES</span>
+                                <span class="score-label">MANIFOLD</span>
+                            </div>
+                            <div class="score-box lose">
+                                <span class="score-val red">NO (Div)</span>
+                                <span class="score-label">EULER</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="font-size: 0.6rem; color: #444; text-align: right; margin-top: 10px;">
+                        STATUS: <span style="color: #00ff88;">OPTIMIZED</span>
                     </div>
                 </div>
 
